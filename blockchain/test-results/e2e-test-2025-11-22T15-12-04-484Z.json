@@ -1,0 +1,150 @@
+{
+  "timestamp": "2025-11-22T15:10:49.630Z",
+  "network": "sepolia",
+  "gateway": "0x1378329ABE689594355a95bDAbEaBF015ef9CF39",
+  "api": "https://api.pp.slavy.space",
+  "actors": {
+    "owner": "0x2786e48814C2E562A92aE53187b848DBB312d1a4",
+    "merchant": "0x2786e48814C2E562A92aE53187b848DBB312d1a4",
+    "customer": "0xc45112B334822811f4418e2f13C2C80FF790C949"
+  },
+  "steps": [
+    {
+      "step": 1,
+      "name": "Create Payment Request",
+      "status": "passed",
+      "startTime": "2025-11-22T15:10:50.676Z",
+      "data": {
+        "id": "66586ee8-0492-4035-95ee-f8ee68514378",
+        "orderId": "E2E-FULL-TEST-1763824250676",
+        "amountUsd": 20,
+        "status": "pending",
+        "paymentUrl": "https://app.pp.slavy.space/checkout/E2E-FULL-TEST-1763824250676",
+        "expiresAt": "2025-11-23T15:10:51.405Z",
+        "createdAt": "2025-11-22T15:10:51.406Z"
+      },
+      "endTime": "2025-11-22T15:10:51.413Z"
+    },
+    {
+      "step": 2,
+      "name": "Get Payment Request",
+      "status": "passed",
+      "startTime": "2025-11-22T15:10:51.414Z",
+      "data": {
+        "orderId": "E2E-FULL-TEST-1763824250676",
+        "merchantName": "BRSCPP Payment Gateway",
+        "merchantAddress": "0x2786e48814c2e562a92ae53187b848dbb312d1a4",
+        "amountUsd": 20,
+        "description": "Comprehensive E2E test payment",
+        "expiresAt": "2025-11-23T15:10:51.405Z",
+        "status": "pending",
+        "createdAt": "2025-11-22T15:10:51.406Z"
+      },
+      "endTime": "2025-11-22T15:10:51.619Z"
+    },
+    {
+      "step": 3,
+      "name": "Create Price Quote",
+      "status": "passed",
+      "startTime": "2025-11-22T15:10:51.619Z",
+      "data": {
+        "quoteId": "0xc53582cd7396aa9332ff9792dc5191c937442a38ef2ac94d7c6cda3c4600eca6",
+        "tokenAmount": "0.007270099726502483",
+        "validUntil": "2025-11-22T15:12:00.000Z",
+        "txHash": "0x18a42a095c35748e6462b678ff5f68ac729b3f957e13c0e4d3d98a6281a3189b",
+        "blockNumber": 9683555
+      },
+      "endTime": "2025-11-22T15:11:01.524Z"
+    },
+    {
+      "step": 4,
+      "name": "Process Payment",
+      "status": "passed",
+      "startTime": "2025-11-22T15:11:01.524Z",
+      "data": {
+        "txHash": "0x57115c7c917f715383cfec375d5dcf1c5308489d6183035f1b31505d74d971d2",
+        "blockNumber": 9683560,
+        "gasUsed": "93991",
+        "paymentId": "7",
+        "totalAmount": "0.007270099726502483",
+        "merchantAmount": "0.007233749227869971",
+        "feeAmount": "0.000036350498632512"
+      },
+      "endTime": "2025-11-22T15:12:01.867Z"
+    },
+    {
+      "step": 5,
+      "name": "Wait for Event Listener",
+      "status": "passed",
+      "startTime": "2025-11-22T15:12:01.868Z",
+      "endTime": "2025-11-22T15:12:04.145Z"
+    },
+    {
+      "step": 6,
+      "name": "Verify Database Record",
+      "status": "passed",
+      "startTime": "2025-11-22T15:12:04.145Z",
+      "data": {
+        "orderId": "E2E-FULL-TEST-1763824250676",
+        "status": "completed",
+        "amountUsd": 20,
+        "payment": {
+          "id": "92224a19-c7e9-47a8-97bd-61b4d347bc2b",
+          "txHash": "0x57115c7c917f715383cfec375d5dcf1c5308489d6183035f1b31505d74d971d2",
+          "tokenAmount": 7270099726502483,
+          "usdAmount": 20,
+          "confirmedAt": "2025-11-22T15:12:04.066Z"
+        },
+        "createdAt": "2025-11-22T15:10:51.406Z",
+        "completedAt": "2025-11-22T15:12:04.072Z"
+      },
+      "endTime": "2025-11-22T15:12:04.331Z"
+    },
+    {
+      "step": 7,
+      "name": "Check Webhook Delivery",
+      "status": "passed",
+      "startTime": "2025-11-22T15:12:04.331Z",
+      "endTime": "2025-11-22T15:12:04.406Z"
+    },
+    {
+      "step": 8,
+      "name": "Verify Merchant Stats",
+      "status": "passed",
+      "startTime": "2025-11-22T15:12:04.406Z",
+      "data": {
+        "totalPayments": 3,
+        "totalUsd": 70,
+        "totalCrypto": 25370588227527990
+      },
+      "endTime": "2025-11-22T15:12:04.482Z"
+    }
+  ],
+  "summary": {
+    "totalSteps": 8,
+    "passedSteps": 8,
+    "failedSteps": 0,
+    "warnings": 0
+  },
+  "payment": {
+    "orderId": "E2E-FULL-TEST-1763824250676",
+    "amountUsd": 20,
+    "paymentUrl": "https://app.pp.slavy.space/checkout/E2E-FULL-TEST-1763824250676",
+    "quoteId": "0xc53582cd7396aa9332ff9792dc5191c937442a38ef2ac94d7c6cda3c4600eca6",
+    "tokenAmount": "0.007270099726502483",
+    "txHash": "0x57115c7c917f715383cfec375d5dcf1c5308489d6183035f1b31505d74d971d2",
+    "blockNumber": 9683560,
+    "paymentId": "7"
+  },
+  "verification": {
+    "databaseRecord": true,
+    "webhookDelivered": true,
+    "blockchainPayment": true,
+    "smartContract": true,
+    "eventEmission": true
+  },
+  "links": {
+    "etherscan": "https://sepolia.etherscan.io/tx/0x57115c7c917f715383cfec375d5dcf1c5308489d6183035f1b31505d74d971d2"
+  },
+  "overallStatus": "PASSED"
+}

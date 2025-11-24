@@ -1,0 +1,47 @@
+{
+  "totalTests": 7,
+  "passed": 7,
+  "failed": 0,
+  "attacks": [
+    {
+      "name": "Attack 1: ETH Reentrancy via malicious receive()",
+      "status": "SECURE",
+      "description": "Attack properly blocked",
+      "error": "execution reverted"
+    },
+    {
+      "name": "Attack 2: ERC20 Reentrancy via malicious token callback",
+      "status": "SECURE",
+      "description": "Attack properly blocked",
+      "error": "execution reverted"
+    },
+    {
+      "name": "Attack 3: Front-run victim's quote using attacker contract",
+      "status": "SECURE",
+      "description": "Attack properly blocked",
+      "error": "execution reverted"
+    },
+    {
+      "name": "Attack 4: Replay same quote via attacker contract",
+      "status": "SECURE",
+      "description": "Attack properly blocked",
+      "error": "execution reverted"
+    },
+    {
+      "name": "Attack 5: Gas griefing by consuming all gas in receive()",
+      "status": "SECURE",
+      "description": "Attack properly blocked",
+      "error": "transaction execution reverted (action=\"sendTransaction\", data=null, reason=null, invocation=null, revert=null, transaction={ \"data\": \"\", \"from\": \"0x8eB8Bf106EbC9834a2586D04F73866C7436Ce298\", \"to\": \"0xc41890712A046a92b732cfFD9073bEd223C55dDA\" }, receipt={ \"_type\": \"TransactionReceipt\", \"blobGasPrice\": null, \"blobGasUsed\": null, \"blockHash\": \"0xe72bbbc875e92550452fcfb024e04b7b0382e50a526dff178056654603ed25b3\", \"blockNumber\": 9676312, \"contractAddress\": null, \"cumulativeGasUsed\": \"10279718\", \"from\": \"0x8eB8Bf106EbC9834a2586D04F73866C7436Ce298\", \"gasPrice\": \"1500022\", \"gasUsed\": \"99654\", \"hash\": \"0x8e76d79976d872b09bbce8f5bbb512527095159ec5245f746bf947b956212889\", \"index\": 65, \"logs\": [  ], \"logsBloom\": \"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\", \"root\": null, \"status\": 0, \"to\": \"0xc41890712A046a92b732cfFD9073bEd223C55dDA\" }, code=CALL_EXCEPTION, version=6.15.0)"
+    },
+    {
+      "name": "Legitimate: Withdraw ETH from attacker contract",
+      "status": "PASSED",
+      "description": "Legitimate action worked correctly"
+    },
+    {
+      "name": "Legitimate: Withdraw USDC from attacker contract",
+      "status": "PASSED",
+      "description": "Legitimate action worked correctly"
+    }
+  ]
+}

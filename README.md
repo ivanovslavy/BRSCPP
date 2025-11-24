@@ -1,0 +1,103 @@
+# BRSCPP - Blockchain Real-time Settlement Crypto Payment Protocol
+
+**BRSCPP** is a **non-custodial Web3 payment infrastructure** designed for **instant cryptocurrency settlements without KYC**. It provides a direct **wallet-to-wallet** settlement system with locked price quotes, integrated using **Chainlink Oracles**.
+
+**Current Phase** Live MVP 
+
+**Current Chains** Sepolia 
+
+**Futured Chains** Ethereum, Polygon, BSC 
+
+**Current Supported Tokens** ETH 
+
+**Futured Teoken** USDC USDT  
+
+## What Does BRSCPP Offer?
+
+BRSCPP is the ideal solution for decentralized applications (dApps) and websites that want to accept crypto payments while minimizing risk and complexity.
+
+* **Non-Custodial:** Funds are transferred directly from the customer's wallet to the merchant's wallet. There are no intermediaries and no custody risks.
+* **Price Protection:** We use Chainlink Oracles to lock the price quote (ETH/USD) for a short period during payment, eliminating cryptocurrency volatility.
+* **Instant Settlement:** After the transaction, funds are instantly in your wallet.
+* **Developer Friendly:** Easy integration via a **REST API** and a ready-to-use **WordPress plugin**.
+
+---
+
+## Architecture and Technology (Overview)
+
+The protocol operates on a blockchain network, facilitating direct communication between the merchant, the customer, and the Smart Contract.
+
+* **Smart Contract (Gateway Contract):** Developed in **Solidity**, it manages settlement and interaction with **Chainlink Price Feeds**.
+* **Backend API:** Built with **Node.js/Express.js**, it uses **PostgreSQL** and **Prisma ORM** to handle payment requests and manage API keys.
+* **Frontend Applications:** Divided into a **Marketing Site** and a **Payment Application** (for the customer checkout process), built with **React** and **TailwindCSS**.
+
+**For more detailed technical information, please refer to the individual README files in the `blockchain/` (Smart Contracts), `backend/`, and `frontend/` directories.**
+
+---
+
+## Project Status and Roadmap
+
+| Network | Status | Contract Address (Sepolia) |
+| :--- | :--- | :--- |
+| **Sepolia Testnet** | **Live** (MVP 1.0.0) | `0x1378329ABE689594355a95bDAbEaBF015ef9CF39` |
+| **Ethereum Mainnet**| **Expected** | **Launch: June 2026** |
+
+### Concise Roadmap
+
+| Period | Focus |
+| :--- | :--- |
+| **Q1-Q2 2026** | Adding support for **Stablecoins** (USDC, USDT). Preparation for multi-chain integration. **Extensive Beta Testing.** |
+| **Q3-Q4 2026** | **Ethereum Mainnet Launch**. Deployment on Polygon and Binance Smart Chain (BSC). Marketing campaigns and community expansion. |
+
+---
+
+## Beta Testing Program: Seeking Testers
+
+BRSCPP is currently in the beta testing phase on the **Sepolia Testnet**. We are looking for developers and merchants to integrate our API and test payment flows.
+
+### Benefits for Active Beta Testers (Lifetime):
+
+* **0% Transaction Fees** on Mainnet grant lifeteme for each tester with adecuated feedback.
+* **SepoliaETH Faucet** grant Faucet access for registered testers 0.05eth/day. Please write me message from the contact form on https://me.slavy.space .
+
+**How to Join:**
+1. Register as a merchant: **`https://pp.slavy.space/register`**
+
+---
+
+## Job Opening: Marketing Specialist
+
+We are seeking an experienced **Marketing Specialist** to develop the go-to-market strategy and build a community around the BRSCPP protocol.
+
+**Core Responsibilities:**
+
+* Social media management and content development.
+* Developer outreach programs.
+* Partnership development and community engagement.
+* Payable or CoOwner agreements possible also
+
+**For Contact and Application:** [me.slavy.space](https://me.slavy.space)
+
+
+We are seeking an experienced **React Developer** to develop the go-to-mar>
+
+**Core Responsibilities:**
+
+* Design & Develop a nice - user friendly UI
+* Payable or CoOwner agreements possible also
+
+**For Contact and Application:** [me.slavy.space](https://me.slavy.space)
+
+
+---
+
+## Contact and Support
+
+| Resource | Link |
+| :--- | :--- |
+| **Documentation** | [https://pp.slavy.space/docs](https://pp.slavy.space/docs) |
+| **GitHub Repository** | [https://github.com/ivanovslavy/BRSCPP](https://github.com/ivanovslavy/BRSCPP) |
+| **General/Business Contact**| [me.slavy.space](https://me.slavy.space) (use the contact form) |
+| **Bug/Security Submissions**| [me.slavy.space](https://me.slavy.space) |
+
+**License:** MIT License.
