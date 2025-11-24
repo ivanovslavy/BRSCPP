@@ -1,0 +1,109 @@
+{
+  "network": "sepolia",
+  "testStartTime": "2025-11-21T09:13:00.858Z",
+  "steps": [
+    {
+      "step": "Mint tokens",
+      "description": "Minted 1000 USDC and 1000 USDT to customer"
+    },
+    {
+      "testName": "ETH Payment",
+      "token": "ETH (Native)",
+      "tokenAddress": "0x0000000000000000000000000000000000000000",
+      "balancesBefore": {
+        "merchant": "6.230920097208376546",
+        "customer": "1.728400614835864926",
+        "feeCollector": "6.230920097208376546"
+      },
+      "priceQuote": {
+        "quoteId": "0xc1dfd64d1fdfece82b210b2373df5ccbb77ae8e25772138a053f5cc8bf9e27c6",
+        "usdAmount": "$200.00",
+        "tokenAmount": "0.073740058918307075 ETH",
+        "tokenPriceUSD": "$2712.23"
+      },
+      "balancesAfter": {
+        "merchant": "6.304659887623275336",
+        "customer": "1.654660431036484741",
+        "feeCollector": "6.304659887623275336"
+      },
+      "balanceChanges": {
+        "merchant": "0.07373979041489879 ETH",
+        "customer": "-0.073740183799380185 ETH",
+        "feeCollector": "0.07373979041489879 ETH"
+      }
+    },
+    {
+      "testName": "USDC Payment",
+      "token": "USDC (ERC20)",
+      "tokenAddress": "0x19609224469b089A1FA8B6938692752c5d2a909d",
+      "balancesBefore": {
+        "merchant": "100.062403",
+        "customer": "5899.937597",
+        "feeCollector": "100.062403"
+      },
+      "priceQuote": {
+        "quoteId": "0xaf5fe66bc1e8df241ac5bdda430048769783297850790ce28d29d9551122a257",
+        "usdAmount": "$100.00",
+        "tokenAmount": "100.062403 USDC",
+        "tokenPriceUSD": "$0.999376"
+      },
+      "balancesAfter": {
+        "merchant": "200.124806",
+        "customer": "5799.875194",
+        "feeCollector": "200.124806"
+      },
+      "balanceChanges": {
+        "merchant": "100.062403 USDC",
+        "customer": "-100.062403 USDC",
+        "feeCollector": "100.062403 USDC"
+      }
+    },
+    {
+      "testName": "USDT Payment",
+      "token": "USDT (ERC20)",
+      "tokenAddress": "0x6d505691C9116fB8b0839aeAb30A898ba29D0272",
+      "balancesBefore": {
+        "merchant": "99.962379",
+        "customer": "5900.037621",
+        "feeCollector": "99.962379"
+      },
+      "priceQuote": {
+        "quoteId": "0x2fc6909cd080eb7f841a818b2db1175697b615cc2355dcee97da7c3fd0948951",
+        "usdAmount": "$100.00",
+        "tokenAmount": "99.962379 USDT",
+        "tokenPriceUSD": "$1.000376"
+      },
+      "balancesAfter": {
+        "merchant": "199.924758",
+        "customer": "5800.075242",
+        "feeCollector": "199.924758"
+      },
+      "balanceChanges": {
+        "merchant": "99.962379 USDT",
+        "customer": "-99.962379 USDT",
+        "feeCollector": "99.962379 USDT"
+      }
+    }
+  ],
+  "summary": {
+    "totalTests": 3,
+    "completed": 4,
+    "failed": 0
+  },
+  "contracts": {
+    "gateway": "0x3464eFB3801FE8Ef813fb127445e041C4CAF8371",
+    "usdc": "0x19609224469b089A1FA8B6938692752c5d2a909d",
+    "usdt": "0x6d505691C9116fB8b0839aeAb30A898ba29D0272"
+  },
+  "actors": {
+    "merchant": "0x2786e48814C2E562A92aE53187b848DBB312d1a4",
+    "customer": "0xc45112B334822811f4418e2f13C2C80FF790C949",
+    "sameAddress": false
+  },
+  "gatewayConfig": {
+    "feePercentage": "50",
+    "feePercentageDecimal": "0.5%",
+    "feeCollector": "0x2786e48814C2E562A92aE53187b848DBB312d1a4"
+  },
+  "testEndTime": "2025-11-21T09:15:02.489Z"
+}

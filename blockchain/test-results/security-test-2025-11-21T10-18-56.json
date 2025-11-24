@@ -1,0 +1,79 @@
+{
+  "totalTests": 12,
+  "passed": 12,
+  "failed": 0,
+  "attacks": [
+    {
+      "name": "Attack 1: Non-owner tries to update fee percentage",
+      "status": "SECURE",
+      "description": "Attack properly blocked",
+      "error": "execution reverted"
+    },
+    {
+      "name": "Attack 2: Hacker tries to change fee collector to himself",
+      "status": "SECURE",
+      "description": "Attack properly blocked",
+      "error": "execution reverted"
+    },
+    {
+      "name": "Attack 3: Replay same quote twice",
+      "status": "SECURE",
+      "description": "Attack properly blocked",
+      "error": "execution reverted"
+    },
+    {
+      "name": "Attack 4: Use expired quote",
+      "status": "SECURE",
+      "description": "Attack properly blocked",
+      "error": "The method evm_increaseTime does not exist/is not available"
+    },
+    {
+      "name": "Attack 5: Send wrong ETH amount",
+      "status": "SECURE",
+      "description": "Attack properly blocked",
+      "error": "execution reverted"
+    },
+    {
+      "name": "Attack 6: Try to pay to zero address",
+      "status": "SECURE",
+      "description": "Attack properly blocked",
+      "error": "execution reverted"
+    },
+    {
+      "name": "Attack 7: Non-owner tries to pause contract",
+      "status": "SECURE",
+      "description": "Attack properly blocked",
+      "error": "execution reverted"
+    },
+    {
+      "name": "Attack 8: Unauthorized emergency withdraw",
+      "status": "SECURE",
+      "description": "Attack properly blocked",
+      "error": "execution reverted"
+    },
+    {
+      "name": "Attack 9: Pay with ERC20 without approval",
+      "status": "SECURE",
+      "description": "Attack properly blocked",
+      "error": "execution reverted"
+    },
+    {
+      "name": "Attack 10: Non-owner tries to add malicious oracle",
+      "status": "SECURE",
+      "description": "Attack properly blocked",
+      "error": "execution reverted"
+    },
+    {
+      "name": "Attack 11: Front-run legitimate transaction",
+      "status": "SECURE",
+      "description": "Attack properly blocked",
+      "error": "execution reverted"
+    },
+    {
+      "name": "Attack 12: Try to cause integer overflow with huge amount",
+      "status": "SECURE",
+      "description": "Attack properly blocked",
+      "error": "execution reverted: panic: arithmetic underflow or overflow (0x11)"
+    }
+  ]
+}
