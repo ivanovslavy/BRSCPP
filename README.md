@@ -18,8 +18,6 @@
 
 **Landing Page** https://pp.slavy.space/ 
 
----
-
 ## What Does BRSCPP Offer?
 
 BRSCPP is the ideal solution for decentralized applications (dApps) and websites that want to accept crypto payments while minimizing risk and complexity.
@@ -28,8 +26,6 @@ BRSCPP is the ideal solution for decentralized applications (dApps) and websites
 * **Price Protection:** We use Chainlink Oracles to lock the price quote (e.g., ETH/USD) for a short period during payment, eliminating cryptocurrency volatility risks during the transaction window.
 * **Instant Settlement:** After the transaction is confirmed, funds are instantly in your wallet.
 * **Developer Friendly:** Easy integration via a **REST API** and a ready-to-use **WordPress plugin**.
-
----
 
 ## Architecture and Technology (Overview)
 
@@ -40,8 +36,6 @@ The protocol operates on a blockchain network, facilitating direct communication
 * **Frontend Applications:** Divided into a **Marketing Site** and a **Payment Application** (for the customer checkout process), built with **React** and **TailwindCSS**.
 
 **For more detailed technical information, please refer to the individual README files in the `blockchain/` (Smart Contracts), `backend/`, and `frontend/` directories.**
-
----
 
 ## Project Status and Roadmap
 
@@ -54,7 +48,12 @@ The protocol operates on a blockchain network, facilitating direct communication
 
 | Period | Focus |
 | :--- | :--- |
-| **Q1-Q2 2026** | Adding support for **Stablecoins** (USDC, USDT). Preparation for multi-chain integration. **Extensive Beta Testing.** |
+| **Q1 2025** | Design and architecture **full plan**. Preparation |
+| **Q1-Q2 2025** | Writing and testing **solidity** protocol |
+| **Q3 2025** | Writing and testing backend gateway **Node.js**  |
+| **Q3-Q4 2025** | Writing and testing frontend infrastructure **Landing Page + Payment Page** **React.js** |
+| **Q3 2025** | Writing additional **java scipt** tests, publishing and looking for **Marketing specialist** and **React.js Senior devv**.  |
+| **Q1-Q2 2026** | Adding support for **Stablecoins** (USDC, USDT, EURC). Preparation for multi-chain integration. **Extensive Beta Testing.** |
 | **Q3-Q4 2026** | **Ethereum Mainnet Launch**. Deployment on Polygon and Binance Smart Chain (BSC). Marketing campaigns and community expansion. |
 
 ---
