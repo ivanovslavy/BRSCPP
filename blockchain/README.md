@@ -59,7 +59,7 @@ BRSCryptoPaymentProtocol is a decentralized cryptocurrency payment gateway for E
 ### Contract Functions
 
 **User Functions**
-```solidity
+*solidity*
 lockPriceQuote(address token, uint256 usdAmount) 
     returns (bytes32 quoteId, uint256 tokenAmount, uint256 validUntil)
 
@@ -72,7 +72,7 @@ getPriceQuote(address token, uint256 usdAmount) view
 ```
 
 **Admin Functions**
-```solidity
+*solidity*
 updateFeePercentage(uint256 newFeePercentage)
 updateFeeCollector(address newFeeCollector)
 addSupportedToken(address token, address priceFeed)
@@ -83,7 +83,8 @@ updateMaxPriceDeviation(uint256 newDeviation)
 pause()
 unpause()
 emergencyWithdraw(address token, uint256 amount, address to)
-```
+
+***
 
 ## Deployment
 
@@ -107,14 +108,13 @@ npx hardhat run scripts/deploy+verify.js --network sepolia
 ```
 
 **Configuration (.env):**
-```
+
 PRIVATE_KEY=<deployer_private_key>
 OWNER_ADDRESS=<contract_owner>
 FEE_COLLECTOR_ADDRESS=<fee_recipient>
 INITIAL_FEE_PERCENTAGE=50
 INFURA_API_KEY=<infura_key>
 ETHERSCAN_API_KEY=<etherscan_key>
-```
 
 **Deployment Output:**
 - Contract addresses saved to `deployed/{network}.json`
@@ -134,9 +134,10 @@ Features:
 - Integration with existing gateway deployment
 
 **Deployment Process:**
-```bash
+**bash**
 npx hardhat run scripts/deploy-attacker.js --network sepolia
-```
+
+***
 
 **MaliciousAttacker Contract:**
 - Reentrancy attack simulation
@@ -165,9 +166,10 @@ Test Coverage:
 - Integer overflow protection
 
 **Execution:**
-```bash
+**bash**
 npx hardhat run scripts/security-test.js --network sepolia
-```
+
+***
 
 **Results:** 12/12 tests passed (100% security score)
 
@@ -192,9 +194,10 @@ Test Coverage:
 6. Withdrawal function verification
 
 **Execution:**
-```bash
+**bash**
 npx hardhat run scripts/security-test-phase2.js --network sepolia
-```
+
+***
 
 **Results:** 7/7 tests passed (100% security score)
 
@@ -211,9 +214,10 @@ Test Coverage:
 - Event emission validation
 
 **Execution:**
-```bash
+**bash**
 npx hardhat run scripts/test-payment-flow.js --network sepolia
-```
+
+***
 
 **Results:** All payment flows successful with correct fee distribution
 
@@ -229,16 +233,18 @@ Detailed analysis with step-by-step demonstration:
 - Recommended fixes validation
 
 **Execution:**
-```bash
+**bash**
 npx hardhat run scripts/analyze-vulnerabilities.js --network sepolia
-```
+
+***
 
 ### Static Analysis
 
 **Slither Analysis:**
-```bash
+**bash**
 slither contracts/CryptoPaymentGateway.sol
-```
+
+***
 
 **Results:** 0 vulnerabilities detected
 
@@ -306,7 +312,7 @@ slither contracts/CryptoPaymentGateway.sol
 - Any EVM-compatible chain with Chainlink oracles
 
 ## Project Structure
-```
+
 gateway2/
 ├── contracts/
 │   ├── CryptoPaymentGateway.sol    # Main payment gateway
@@ -336,7 +342,7 @@ gateway2/
 ## Configuration
 
 ### Environment Variables
-```
+
 PRIVATE_KEY=                    # Deployer private key
 CUSTOMER_PRIVATE_KEY=           # Test customer private key
 HACKER_PRIVATE_KEY=             # Security test private key
@@ -345,7 +351,7 @@ FEE_COLLECTOR_ADDRESS=          # Fee recipient address
 INITIAL_FEE_PERCENTAGE=         # Fee in basis points (50 = 0.5%)
 INFURA_API_KEY=                 # Infura project ID
 ETHERSCAN_API_KEY=              # Etherscan API key
-```
+
 
 ### Network Configuration
 
@@ -361,17 +367,19 @@ Supported networks configured in `hardhat.config.js`:
 ## Development
 
 ### Setup
-```bash
+**bash**
 npm install
-```
+
+***
 
 ### Compilation
-```bash
+**bash**
 npx hardhat compile
-```
+
+***
 
 ### Testing
-```bash
+**bash**
 # Local tests
 npx hardhat test
 
@@ -379,16 +387,14 @@ npx hardhat test
 npx hardhat run scripts/test-payment-flow.js --network sepolia
 npx hardhat run scripts/security-test.js --network sepolia
 npx hardhat run scripts/security-test-phase2.js --network sepolia
-```
 
 ### Deployment
-```bash
+**bash**
 # Deploy main gateway
 npx hardhat run scripts/deploy+verify.js --network sepolia
 
 # Deploy attacker contract
 npx hardhat run scripts/deploy-attacker.js --network sepolia
-```
 
 ## Future Enhancements
 
@@ -418,6 +424,5 @@ GitHub: [@ivanovslavy](https://github.com/ivanovslavy)
 
 MIT License - See LICENSE file for details
 
----
 
 **Note:** This is a development version deployed on testnet. Exercise caution and conduct thorough testing before mainnet deployment. The protocol is provided as-is without warranty. Users are responsible for their own due diligence and security audits.

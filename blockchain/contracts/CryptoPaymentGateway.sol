@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.27;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -8,11 +8,12 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 
-/**
+/*
  * @title CryptoPaymentGateway
  * @notice Decentralized payment processor with hybrid multi-oracle price validation
  * @dev Supports ETH and whitelisted ERC20 tokens with Chainlink + secondary oracle
- * @author BRSCPP Team
+ * @author Slavcho Ivanov 
+ * @github https://github.com/ivanovslavy/brscpp
  */
 contract CryptoPaymentGateway is Ownable, ReentrancyGuard, Pausable {
     using SafeERC20 for IERC20;
@@ -600,7 +601,6 @@ contract CryptoPaymentGateway is Ownable, ReentrancyGuard, Pausable {
     
     if (quote.createdAt == 0) revert QuoteNotFound();
     
-    // NEW CHECK
     if (quote.creator != msg.sender) revert UnauthorizedQuoteUse();
     
     if (quote.isUsed) revert QuoteAlreadyUsed();
@@ -830,7 +830,7 @@ contract CryptoPaymentGateway is Ownable, ReentrancyGuard, Pausable {
      * @dev Only owner can call this function and only when contract is paused
      * @dev Used to recover accidentally sent tokens or in emergency situations
      */
-    // contracts/CryptoPaymentGateway.sol: ~833
+     
     function emergencyWithdraw(
     address token,
     uint256 amount,
@@ -849,10 +849,9 @@ contract CryptoPaymentGateway is Ownable, ReentrancyGuard, Pausable {
         IERC20 tokenContract = IERC20(token);
         if (tokenContract.balanceOf(address(this)) < amount) revert InsufficientBalance();
 
-        tokenContract.safeTransfer(to, amount); // ➡️ INTERACTION
+        tokenContract.safeTransfer(to, amount); 
     }
 
-    // Премахнете старото emit EmergencyWithdraw(token, amount, to); от края
     }
 
     // ============ Receive Function ============

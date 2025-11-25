@@ -3,7 +3,7 @@ const hre = require("hardhat");
 const fs = require("fs");
 const path = require("path");
 
-// Chainlink Price Feed адреси за различни мрежи
+// Chainlink Price Feed 
 const PRICE_FEEDS = {
   sepolia: {
     ETH_USD: "0x694AA1769357215DE4FAC081bf1f309aDC325306",
@@ -96,7 +96,7 @@ async function main() {
   console.log("Deployer:", deployer.address);
   console.log("Balance:", hre.ethers.formatEther(await hre.ethers.provider.getBalance(deployer.address)), "ETH");
   
-  // Параметри от .env
+  // Parameters from .env
   const ownerAddress = process.env.OWNER_ADDRESS || deployer.address;
   const feeCollectorAddress = process.env.FEE_COLLECTOR_ADDRESS || deployer.address;
   const initialFeePercentage = process.env.INITIAL_FEE_PERCENTAGE || 50;
@@ -120,7 +120,7 @@ async function main() {
     }
   };
   
-  // Deploy MockERC20 tokens за тестови мрежи
+  // Deploy MockERC20 tokens for all test networks
   let usdcToken, usdtToken;
   if (["localhost", "hardhat", "sepolia", "bsctestnet", "amoy"].includes(network)) {
     console.log("\n🪙 Deploying Mock Tokens...");
@@ -154,7 +154,7 @@ async function main() {
   console.log("✅ CryptoPaymentGateway deployed:", gatewayAddress);
   deploymentInfo.contracts.CryptoPaymentGateway = gatewayAddress;
   
-  // Конфигурация на price feeds и tokens
+  // Config price feeds и tokens
   console.log("\n⚙️  Configuring Gateway...");
   
   const nativeToken = "0x0000000000000000000000000000000000000000";
@@ -185,7 +185,7 @@ async function main() {
     priceFeeds.USDT_USD = await usdtUsdFeed.getAddress();
     console.log("✅ Mock USDT/USD feed:", priceFeeds.USDT_USD);
     
-    // Secondary oracles - използваме същите за тест
+    // Secondary oracles 
     if (primaryOracleAddress) {
       priceFeeds.ETH_USD_PRIMARY = primaryOracleAddress;
     }
@@ -193,7 +193,7 @@ async function main() {
       priceFeeds.ETH_USD_SECONDARY = secondaryOracleAddress;
     }
   } else {
-    // За production мрежи - използваме реални Chainlink feeds
+    // For production  Chainlink feeds
     priceFeeds = PRICE_FEEDS[network] || {};
     
     if (Object.keys(priceFeeds).length === 0) {
@@ -201,7 +201,7 @@ async function main() {
       console.log("⚠️  Skipping token configuration. You must configure manually.");
     }
     
-    // Добави custom oracle адреси от .env
+    // Add custom oracle addresses from .env
     if (primaryOracleAddress) {
       priceFeeds.PRIMARY_ORACLE = primaryOracleAddress;
     }
@@ -212,7 +212,7 @@ async function main() {
   
   deploymentInfo.priceFeeds = priceFeeds;
   
-  // Setup Native Token (ETH/BNB/MATIC) само ако има price feed
+  // Setup Native Token (ETH/BNB/MATIC) only if have price feed
   const nativeFeed = priceFeeds.ETH_USD || priceFeeds.BNB_USD || priceFeeds.MATIC_USD;
   if (nativeFeed) {
     try {
@@ -226,7 +226,7 @@ async function main() {
       await tx.wait();
       console.log("✅ Native token staleness set");
       
-      // Добави secondary oracle ако има
+      // Add secondary oracle if have
       if (secondaryOracleAddress) {
         tx = await gateway.addSecondaryOracle(nativeToken, secondaryOracleAddress);
         await tx.wait();
@@ -273,7 +273,7 @@ async function main() {
     }
   }
   
-  // Запази deployment info
+  // Save deployment info
   const deployDir = path.join(__dirname, "..", "deployed");
   if (!fs.existsSync(deployDir)) {
     fs.mkdirSync(deployDir, { recursive: true });
@@ -284,7 +284,7 @@ async function main() {
   
   console.log("\n✅ Deployment info saved to:", deployFile);
   
-  // Верификация на контракти (само за non-localhost мрежи)
+  // Verify contracts
   if (network !== "localhost" && network !== "hardhat") {
     console.log("\n⏳ Waiting 30 seconds before verification...");
     await sleep(30000);
@@ -330,7 +330,7 @@ async function main() {
       verificationResults.results.push(usdtResult);
     }
     
-    // Запази verification results
+    // Save verification results
     const verifyFile = path.join(deployDir, `${network}-verification.json`);
     fs.writeFileSync(verifyFile, JSON.stringify(verificationResults, null, 2));
     console.log("\n✅ Verification results saved to:", verifyFile);
@@ -351,7 +351,7 @@ async function main() {
   if (usdcToken) console.log("📋 Mock USDC:", await usdcToken.getAddress());
   if (usdtToken) console.log("📋 Mock USDT:", await usdtToken.getAddress());
   
-  // Print Etherscan links за non-localhost
+  // Print Etherscan links for non-localhost
   if (network !== "localhost" && network !== "hardhat") {
     const explorerPrefix = network === 'mainnet' ? '' : network + '.';
     console.log("\n🔗 Etherscan Links:");

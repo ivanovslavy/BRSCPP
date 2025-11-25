@@ -38,7 +38,7 @@ async function main() {
   const MockV3Aggregator = await hre.ethers.getContractFactory("MockV3Aggregator");
   
   // ETH/USD Secondary = $2010 (primary е $2000 в deployment)
-  // Ще използваме реалния Chainlink като primary, а mock като secondary
+  // Will use the real Chainlink like primary, mock like secondary
   const ethUsdSecondary = await MockV3Aggregator.deploy(8, 201000000000); // $2010
   await ethUsdSecondary.waitForDeployment();
   const ethSecondaryAddr = await ethUsdSecondary.getAddress();

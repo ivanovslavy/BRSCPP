@@ -72,7 +72,6 @@ async function main() {
     }
   };
   
-  // Deploy MockERC20 tokens за тестови мрежи
   let usdcToken, usdtToken;
   if (["localhost", "hardhat", "sepolia", "bsctestnet", "amoy"].includes(network)) {
     console.log("\n🪙 Deploying Mock Tokens...");
@@ -106,7 +105,7 @@ async function main() {
   console.log("✅ CryptoPaymentGateway deployed:", gatewayAddress);
   deploymentInfo.contracts.CryptoPaymentGateway = gatewayAddress;
   
-  // Конфигурация на price feeds и tokens
+  // Config price feeds и tokens
   console.log("\n⚙️  Configuring Gateway...");
   
   const nativeToken = "0x0000000000000000000000000000000000000000";
@@ -137,7 +136,7 @@ async function main() {
     priceFeeds.USDT_USD = await usdtUsdFeed.getAddress();
     console.log("✅ Mock USDT/USD feed:", priceFeeds.USDT_USD);
     
-    // Secondary oracles - използваме същите за тест
+    // Secondary oracles 
     if (primaryOracleAddress) {
       priceFeeds.ETH_USD_PRIMARY = primaryOracleAddress;
     }
@@ -145,7 +144,7 @@ async function main() {
       priceFeeds.ETH_USD_SECONDARY = secondaryOracleAddress;
     }
   } else {
-    // За production мрежи - използваме реални Chainlink feeds
+    // Chainlink feeds
     priceFeeds = PRICE_FEEDS[network] || {};
     
     if (Object.keys(priceFeeds).length === 0) {
@@ -153,7 +152,7 @@ async function main() {
       console.log("⚠️  Skipping token configuration. You must configure manually.");
     }
     
-    // Добави custom oracle адреси от .env
+    // Add custom oracle addresses from .env
     if (primaryOracleAddress) {
       priceFeeds.PRIMARY_ORACLE = primaryOracleAddress;
     }
@@ -164,7 +163,7 @@ async function main() {
   
   deploymentInfo.priceFeeds = priceFeeds;
   
-  // Setup Native Token (ETH/BNB/MATIC) само ако има price feed
+  // Setup Native Token (ETH/BNB/MATIC) if have price feed
   const nativeFeed = priceFeeds.ETH_USD || priceFeeds.BNB_USD || priceFeeds.MATIC_USD;
   if (nativeFeed) {
     try {
@@ -225,7 +224,7 @@ async function main() {
     }
   }
   
-  // Запази deployment info
+  // Save deployment info
   const deployDir = path.join(__dirname, "..", "deployed");
   if (!fs.existsSync(deployDir)) {
     fs.mkdirSync(deployDir, { recursive: true });
@@ -321,7 +320,7 @@ async function main() {
       }
     }
     
-    // Запази verification results
+    // Save verification results
     const verifyFile = path.join(deployDir, `${network}-verification.json`);
     fs.writeFileSync(verifyFile, JSON.stringify(verificationResults, null, 2));
     console.log("\n✅ Verification results saved to:", verifyFile);

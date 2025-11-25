@@ -18,7 +18,6 @@ async function main() {
   const currentCollector = await gateway.feeCollector();
   console.log("Current Fee Collector:", currentCollector);
   
-  // Вземи от .env файла
   const newCollector = process.env.FEE_COLLECTOR_ADDRESS;
   
   if (!newCollector) {

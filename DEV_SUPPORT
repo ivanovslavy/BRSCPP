@@ -2,15 +2,9 @@
 
 This document provides a **structured, README-style technical guide** for the full end‑to‑end integration flow of a merchant using the **BRSCPP (Blockchain Real-time Settlement Crypto Payment Protocol)**.
 
-It follows the same formatting, tone, and structural style as the existing project README.
-
----
-
 # BRSCPP Merchant Integration Flow
 
-This guide outlines an example real-world integration for a merchant: **Ivan's Digital Shop**, which wants to accept non-custodial crypto payments without managing private keys.
-
----
+This guide outlines an example real-world integration for a merchant: **Ivan's Digital Shop**, which wants to accept non-custodial crypto payments without managing private keys and no KYC verification.
 
 ## Overview
 
@@ -42,9 +36,7 @@ The merchant connects their preferred wallet (MetaMask or compatible EVM wallet)
 
 **Example Wallet Address:**
 
-```
 0x742d35Cc6634C0532925a3b844Bc454e4438f44e
-```
 
 ### API Key
 
@@ -56,11 +48,8 @@ pk_test_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6
 
 This key should be stored securely in environment variables:
 
-```dotenv
+**dotenv**
 BRSCPP_API_KEY=pk_test_a1b2c3...
-```
-
----
 
 ## 2. Backend Integration (Node.js Example)
 
@@ -72,7 +61,7 @@ Below is a real-world backend implementation that:
 * Stores the payment entry locally
 * Returns the checkout URL to the frontend
 
-```javascript
+**javascript**
 const express = require('express');
 const axios = require('axios');
 require('dotenv').config();
@@ -128,15 +117,14 @@ app.post('/checkout', async (req, res) => {
 });
 
 app.listen(3000);
-```
 
----
+***
 
 ## 3. Frontend Integration (React Example)
 
 A simple checkout page initiating the crypto payment request.
 
-```javascript
+**javascript**
 function CheckoutPage({ product }) {
   const [loading, setLoading] = useState(false);
 
@@ -172,9 +160,8 @@ function CheckoutPage({ product }) {
     </div>
   );
 }
-```
 
----
+***
 
 ## 4. Customer Payment Flow
 
@@ -196,12 +183,9 @@ Once redirected to the BRSCPP payment page, the customer completes the following
 
 A simplified settlement diagram:
 
-```
 Customer Wallet --> Gateway Contract --> |99.5%| Merchant Wallet
                                       \-> |0.5%| Fee Collector
-```
 
----
 
 ## 5. Webhook Notification
 
@@ -209,7 +193,7 @@ Merchants receive real-time webhook events when payment is completed.
 
 ### Webhook Registration
 
-```bash
+**bash**
 curl -X POST https://api.pp.slavy.space/api/merchant/webhook \
   -H "Authorization: Bearer pk_test_a1b2..." \
   -H "Content-Type: application/json" \
@@ -217,11 +201,12 @@ curl -X POST https://api.pp.slavy.space/api/merchant/webhook \
     "webhookUrl": "https://ivanshop.com/webhook/brscpp",
     "webhookSecret": "my_secret_key_12345"
   }'
-```
+
+***
 
 ### Webhook Handler (Node.js)
 
-```javascript
+***javascript***
 const crypto = require('crypto');
 
 app.post('/webhook/brscpp', express.json(), async (req, res) => {
@@ -247,11 +232,12 @@ app.post('/webhook/brscpp', express.json(), async (req, res) => {
 
   res.status(200).send('OK');
 });
-```
+
+***
 
 ### Example Webhook Payload
 
-```json
+***json***
 {
   "event": "payment.completed",
   "payment": {
@@ -263,15 +249,14 @@ app.post('/webhook/brscpp', express.json(), async (req, res) => {
     "timestamp": "2025-11-24T15:30:00Z"
   }
 }
-```
 
----
+***
 
 ## 6. Alternative: Polling Payment Status
 
 If the merchant cannot use webhooks, they may poll:
 
-```javascript
+***javascript***
 async function checkPaymentStatus(orderId) {
   const response = await axios.get(
     `https://api.pp.slavy.space/api/customer/payment/${orderId}/status`
@@ -283,22 +268,18 @@ async function checkPaymentStatus(orderId) {
   }
   return false;
 }
-```
 
----
+***
 
 ## 7. Real-World Flow Summary
 
-```
 Customer -> Ivan's Frontend -> Ivan's Backend -> BRSCPP API -> Payment Page
    |                                                           |
    |                          Smart Contract Settlement        |
    +-----------------------------> Blockchain -----------------+
                                                              |
                                         Webhook -> Backend -> Order Delivered
-```
 
----
 
 ## Need Assistance?
 
@@ -307,6 +288,5 @@ If you need help integrating BRSCPP, contact the support team via:
 * Main site: [https://pp.slavy.space](https://pp.slavy.space)
 * Dev contact: [https://me.slavy.space](https://me.slavy.space)
 
----
 
 **This DEV_SUPPORT document is intended for developers who need a clear, technical, production-ready integration reference for BRSCPP.**

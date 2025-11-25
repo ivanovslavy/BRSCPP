@@ -12,7 +12,7 @@ Customer-facing cryptocurrency payment checkout interface.
 - Sonner (toast notifications)
 
 ## Project Structure
-```
+
 payment-app/
 ├── src/
 │   ├── components/
@@ -33,26 +33,22 @@ payment-app/
 ├── package.json
 ├── vite.config.js
 └── tailwind.config.js
-```
 
 ## Installation
-```bash
+**bash**
 cd ~/pp/frontend/payment-app
 npm install
-```
 
 ## Development
-```bash
+**bash**
 npm run dev
-```
 
 Server runs on http://localhost:3051
 
 ## Production Build
-```bash
+**bash**
 npm run build
 npm run preview
-```
 
 Build output in `dist/` directory.
 
@@ -61,7 +57,7 @@ Build output in `dist/` directory.
 Site runs as systemd service on port 3051.
 
 ### Service Management
-```bash
+**bash**
 # Start service
 sudo systemctl start brscpp-payment-app.service
 
@@ -73,12 +69,11 @@ sudo systemctl restart brscpp-payment-app.service
 
 # View logs
 sudo journalctl -u brscpp-payment-app.service -f
-```
 
 ### Service Configuration
 
 Location: `/etc/systemd/system/brscpp-payment-app.service`
-```ini
+**ini**
 [Unit]
 Description=BRSCPP Payment Application
 After=network.target
@@ -95,7 +90,6 @@ RestartSec=10
 
 [Install]
 WantedBy=multi-user.target
-```
 
 ## Pages
 
@@ -125,9 +119,8 @@ Merchant dashboard with:
 ## Payment Flow
 
 ### Step 1: Load Payment Request
-```
+
 GET /api/customer/payment/:orderId
-```
 
 Returns merchant info, amount, description.
 
@@ -136,17 +129,17 @@ User connects MetaMask wallet. Application checks network and switches to Sepoli
 
 ### Step 3: Create Quote
 Customer wallet calls smart contract directly:
-```javascript
+**javascript**
 lockPriceQuote(token, usdAmount)
-```
+***
 
 Returns quote ID, token amount, and expiration time. Quote valid for 60 seconds.
 
 ### Step 4: Send Payment
 Customer wallet calls smart contract:
-```javascript
+**javascript**
 processETHPaymentWithQuote(quoteId, merchant, orderId)
-```
+***
 
 Sends ETH to gateway, which splits between merchant and fee collector.
 
@@ -156,22 +149,21 @@ Transaction confirmed on blockchain. Backend event listener processes payment an
 ## Smart Contract Integration
 
 ### Gateway Address
-```
+
 Sepolia: 0x1378329ABE689594355a95bDAbEaBF015ef9CF39
-```
 
 ### ABI Functions
-```javascript
+**javascript**
 lockPriceQuote(address token, uint256 usdAmount)
 processETHPaymentWithQuote(bytes32 quoteId, address merchant, string orderId)
 priceQuotes(bytes32) view returns (...)
-```
+***
 
 ### Events
-```javascript
+**javascript**
 PriceQuoteGenerated(bytes32 quoteId, address token, ...)
 PaymentProcessed(uint256 paymentId, bytes32 quoteId, ...)
-```
+***
 
 ## Features
 
@@ -187,7 +179,7 @@ PaymentProcessed(uint256 paymentId, bytes32 quoteId, ...)
 ## Configuration
 
 ### Vite Config
-```javascript
+**javascript**
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -200,13 +192,14 @@ export default defineConfig({
     allowedHosts: ['app.pp.slavy.space', 'localhost']
   }
 })
-```
+
+***
 
 ### API Endpoints
-```javascript
+**javascript**
 const API_BASE = 'https://api.pp.slavy.space';
 const GATEWAY_ADDRESS = '0x1378329ABE689594355a95bDAbEaBF015ef9CF39';
-```
+***
 
 ## Debug Mode
 
@@ -269,7 +262,7 @@ Open payment URL in wallet's browser.
 ## Testing
 
 ### Create Test Payment
-```bash
+**bash**
 curl -X POST https://api.pp.slavy.space/api/merchant/payment-request \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
@@ -278,7 +271,8 @@ curl -X POST https://api.pp.slavy.space/api/merchant/payment-request \
     "amountUsd": "10",
     "description": "Test payment"
   }'
-```
+
+***
 
 Returns payment URL. Open in browser to test checkout flow.
 
@@ -295,18 +289,18 @@ https://sepoliafaucet.com
 - Use same wallet that created quote
 
 ### CSS Not Loading
-```bash
+**bash**
 rm -rf dist node_modules/.vite
 npm run build
 sudo systemctl restart brscpp-payment-app.service
-```
+***
 
 ### MetaMask Not Detected
-```bash
+**bash**
 # Check console for errors
 # Install MetaMask extension
 # Refresh page after installation
-```
+***
 
 ## Links
 

@@ -19,10 +19,10 @@ async function main() {
   const [signer] = await hre.ethers.getSigners();
   const secondaryOracle = await hre.ethers.getContractAt("MockV3Aggregator", secondaryOracleAddr);
   
-  // Chainlink показва $2810, направи secondary ~$2810 (в рамките на 5%)
-  const newPrice = 285000000000; // $2810 с 8 decimals
+  // Chainlink show $2940, make secondary ~$2940 (in 5% borders)
+  const newPrice = 294000000000; // $2940 с 8 decimals
   
-  console.log("\n🔧 Updating secondary price to: $2750");
+  console.log("\n🔧 Updating secondary price to: $2940");
   const tx = await secondaryOracle.updateAnswer(newPrice);
   await tx.wait();
   

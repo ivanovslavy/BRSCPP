@@ -11,7 +11,7 @@ Informational website for BRSCPP decentralized cryptocurrency payment gateway.
 - ethers.js 6
 
 ## Project Structure
-```
+
 marketing/
 ├── src/
 │   ├── components/
@@ -30,26 +30,23 @@ marketing/
 ├── package.json
 ├── vite.config.js
 └── tailwind.config.js
-```
+
 
 ## Installation
-```bash
+**bash**
 cd ~/pp/frontend/marketing
 npm install
-```
 
 ## Development
-```bash
+**bash**
 npm run dev
-```
 
 Server runs on http://localhost:3050
 
 ## Production Build
-```bash
+**bash**
 npm run build
 npm run preview
-```
 
 Build output in `dist/` directory.
 
@@ -58,7 +55,7 @@ Build output in `dist/` directory.
 Site runs as systemd service on port 3050.
 
 ### Service Management
-```bash
+**bash**
 # Start service
 sudo systemctl start brscpp-marketing.service
 
@@ -70,12 +67,11 @@ sudo systemctl restart brscpp-marketing.service
 
 # View logs
 sudo journalctl -u brscpp-marketing.service -f
-```
 
 ### Service Configuration
 
 Location: `/etc/systemd/system/brscpp-marketing.service`
-```ini
+**ini**
 [Unit]
 Description=BRSCPP Marketing Site
 After=network.target
@@ -92,7 +88,6 @@ RestartSec=10
 
 [Install]
 WantedBy=multi-user.target
-```
 
 ## Pages
 
@@ -120,7 +115,7 @@ Merchant registration form with wallet connection via MetaMask. Creates merchant
 ## Configuration
 
 ### Vite Config
-```javascript
+**javascript**
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -133,7 +128,8 @@ export default defineConfig({
     allowedHosts: ['pp.slavy.space', 'localhost']
   }
 })
-```
+
+***
 
 ### Tailwind Config
 
@@ -147,9 +143,9 @@ Custom color palette with dark theme:
 ## API Integration
 
 Marketing site connects to backend API for merchant registration:
-```
+
 POST https://api.pp.slavy.space/api/merchant/register
-```
+
 
 ## Environment
 
@@ -174,24 +170,23 @@ Requires MetaMask extension for wallet connection.
 ## Troubleshooting
 
 ### CSS not loading
-```bash
+**bash**
 rm -rf dist node_modules/.vite
 npm run build
 sudo systemctl restart brscpp-marketing.service
-```
 
 ### Port already in use
-```bash
+**bash**
 sudo lsof -i :3050
 sudo systemctl stop brscpp-marketing.service
-```
 
 ### Service won't start
-```bash
+**bash**
 sudo journalctl -u brscpp-marketing.service -n 50
 cd ~/pp/frontend/marketing
 npm run build
-```
+
+***
 
 ## Links
 

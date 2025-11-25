@@ -9,7 +9,7 @@ async function main() {
   
   const gatewayAddress = "0x1378329ABE689594355a95bDAbEaBF015ef9CF39";
   const apiBaseUrl = "https://api.pp.slavy.space";
-  const merchantApiKey = "pk_test_c31f9264eba013c90c5ad431516eb7173775434267a1856b";
+  const merchantApiKey = "pk_test_put_your-API-Key_here";
   
   const provider = hre.ethers.provider;
   const owner = new hre.ethers.Wallet(process.env.PRIVATE_KEY, provider);
