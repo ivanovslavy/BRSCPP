@@ -52,11 +52,9 @@ The protocol operates on a blockchain network, facilitating direct communication
 | **Q1-Q2 2025** | Writing and testing **solidity** protocol |
 | **Q3 2025** | Writing and testing backend gateway **Node.js**  |
 | **Q3-Q4 2025** | Writing and testing frontend infrastructure **Landing Page + Payment Page** **React.js** |
-| **Q3 2025** | Writing additional **java scipt** tests, publishing and looking for **Marketing specialist** and **React.js Senior devv**.  |
+| **Q4 2025** | Writing additional **java scipt** tests, publishing and looking for **Marketing specialist** and **React.js Senior devv**.  |
 | **Q1-Q2 2026** | Adding support for **Stablecoins** (USDC, USDT, EURC). Preparation for multi-chain integration. **Extensive Beta Testing.** |
 | **Q3-Q4 2026** | **Ethereum Mainnet Launch**. Deployment on Polygon and Binance Smart Chain (BSC). Marketing campaigns and community expansion. |
-
----
 
 ## Beta Testing Program: Seeking Testers
 
@@ -69,8 +67,6 @@ BRSCPP is currently in the beta testing phase on the **Sepolia Testnet**. We are
 
 **How to Join:**
 1.  Register as a merchant: **`https://pp.slavy.space/register`**
-
----
 
 ## Job Openings
 
@@ -95,8 +91,6 @@ We are seeking an experienced **React Developer** to enhance our frontend applic
 * *Payable or Co-Owner agreements are also possible.*
 
 **For Contact and Application for Both Roles:** [me.slavy.space](https://me.slavy.space)
-
----
 
 ## Contact and Support
 
