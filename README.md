@@ -107,5 +107,6 @@ We are seeking an experienced **React Developer** to enhance our frontend applic
 | **GitHub Repository** | [https://github.com/ivanovslavy/BRSCPP](https://github.com/ivanovslavy/BRSCPP) |
 | **General/Business Contact**| [me.slavy.space](https://me.slavy.space) (use the contact form) |
 | **Bug/Security Submissions**| [me.slavy.space](https://me.slavy.space) |
+| **BRSCPP Full Flow Video**| [youtube.com](https://www.youtube.com/watch?v=3n2e2H9aXAw&t=5s) |
 
 **License:** MIT License.
