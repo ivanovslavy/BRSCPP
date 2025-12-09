@@ -1,20 +1,27 @@
 # Developer Support Guide (DEV_SUPPORT)
 
-This document provides a **structured, README-style technical guide** for the full end‑to‑end integration flow of a merchant using the **BRSCPP (Blockchain Real-time Settlement Crypto Payment Protocol)**.
+This document provides a structured, technical guide for the full end-to-end integration flow of a merchant using **BRSCPP (Blockchain Real-time Settlement Crypto Payment Protocol)**.
 
-# BRSCPP Merchant Integration Flow
+---
+
+## BRSCPP Merchant Integration Flow
 
 This guide outlines an example real-world integration for a merchant: **Ivan's Digital Shop**, which wants to accept non-custodial crypto payments without managing private keys and no KYC verification.
+
+---
 
 ## Overview
 
 BRSCPP enables merchants to accept cryptocurrency payments with:
 
-* **Non-custodial settlement** (funds go directly to merchant wallet)
-* **Chainlink-based price quote locking (60 seconds)**
-* **Smart-contract–secured transactions**
-* **REST API integration**
-* **Webhook notifications** for payment completion
+- **Non-custodial settlement** (funds go directly to merchant wallet via P2P)
+- **Multi-chain support** (Sepolia, BSC Testnet, Polygon Amoy)
+- **Multi-currency support** (12 fiat currencies with automatic USD conversion)
+- **Multi-token payments** (ETH, BNB, USDC, USDT)
+- **Chainlink-based price quote locking** (60-120 seconds depending on network)
+- **Smart-contract secured transactions**
+- **REST API integration**
+- **Webhook notifications** for payment completion
 
 This guide covers the complete merchant flow:
 
@@ -30,38 +37,42 @@ This guide covers the complete merchant flow:
 
 ## 1. Merchant Registration
 
-**Registration Page:** `https://pp.slavy.space/register`
+**Registration Page:** https://pp.slavy.space/register
 
 The merchant connects their preferred wallet (MetaMask or compatible EVM wallet) and submits the registration form.
 
 **Example Wallet Address:**
-
+```
 0x742d35Cc6634C0532925a3b844Bc454e4438f44e
+```
 
 ### API Key
 
 After registration, the merchant receives a **unique API Key** (shown only once). Example:
-
 ```
 pk_test_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6
 ```
 
 This key should be stored securely in environment variables:
+```bash
+# .env
+BRSCPP_API_KEY=pk_test_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6
+```
 
-**dotenv**
-BRSCPP_API_KEY=pk_test_a1b2c3...
+---
 
 ## 2. Backend Integration (Node.js Example)
 
 Below is a real-world backend implementation that:
 
-* Accepts a checkout request
-* Retrieves product details
-* Creates a payment request via BRSCPP API
-* Stores the payment entry locally
-* Returns the checkout URL to the frontend
+- Accepts a checkout request
+- Retrieves product details
+- Creates a payment request via BRSCPP API
+- Stores the payment entry locally
+- Returns the checkout URL to the frontend
 
-**javascript**
+### Example Backend Code
+```javascript
 const express = require('express');
 const axios = require('axios');
 require('dotenv').config();
@@ -73,16 +84,20 @@ const BRSCPP_API_URL = 'https://api.pp.slavy.space';
 const BRSCPP_API_KEY = process.env.BRSCPP_API_KEY;
 
 app.post('/checkout', async (req, res) => {
-  const { productId, customerEmail } = req.body;
+  const { productId, customerEmail, currency, network } = req.body;
 
+  // Get product from database
   const product = await getProductFromDatabase(productId);
 
   try {
+    // Create payment request
     const response = await axios.post(
       `${BRSCPP_API_URL}/api/merchant/payment-request`,
       {
         orderId: `ORDER-${Date.now()}-${productId}`,
         amountUsd: product.price.toString(),
+        currency: currency || 'USD',
+        network: network || 'sepolia',
         description: `Payment for ${product.name}`,
         customerEmail
       },
@@ -96,10 +111,13 @@ app.post('/checkout', async (req, res) => {
 
     const paymentRequest = response.data.paymentRequest;
 
+    // Save payment to database
     await savePaymentToDatabase({
       orderId: paymentRequest.orderId,
       productId,
       amount: paymentRequest.amountUsd,
+      currency: paymentRequest.currency,
+      network: paymentRequest.network,
       status: 'pending',
       paymentUrl: paymentRequest.paymentUrl,
       brscppPaymentId: paymentRequest.id
@@ -117,16 +135,34 @@ app.post('/checkout', async (req, res) => {
 });
 
 app.listen(3000);
+```
 
-***
+### Supported Parameters
+
+**Required:**
+- `orderId` - Unique order identifier
+- `amountUsd` - Amount in USD (string format)
+- `network` - "sepolia" or "bscTestnet"
+
+**Optional:**
+- `currency` - Original fiat currency (USD, EUR, GBP, JPY, CNY, RUB, INR, CAD, AUD, BRL, MXN, KRW)
+- `description` - Payment description
+- `customerEmail` - Customer email for notifications
+
+---
 
 ## 3. Frontend Integration (React Example)
 
-A simple checkout page initiating the crypto payment request.
+A simple checkout page initiating the crypto payment request with network selection.
 
-**javascript**
+### Example Frontend Code
+```javascript
+import { useState } from 'react';
+
 function CheckoutPage({ product }) {
   const [loading, setLoading] = useState(false);
+  const [selectedNetwork, setSelectedNetwork] = useState('sepolia');
+  const [selectedCurrency, setSelectedCurrency] = useState('USD');
 
   const handleCryptoPayment = async () => {
     setLoading(true);
@@ -137,12 +173,19 @@ function CheckoutPage({ product }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           productId: product.id,
-          customerEmail: 'customer@example.com'
+          customerEmail: 'customer@example.com',
+          currency: selectedCurrency,
+          network: selectedNetwork
         })
       });
 
       const data = await response.json();
-      window.location.href = data.paymentUrl;
+      
+      if (data.success) {
+        window.location.href = data.paymentUrl;
+      } else {
+        alert('Payment creation failed');
+      }
     } catch (error) {
       alert('Payment failed');
     } finally {
@@ -153,47 +196,97 @@ function CheckoutPage({ product }) {
   return (
     <div>
       <h2>{product.name}</h2>
-      <p>Price: ${product.price}</p>
+      <p>Price: ${product.price} {selectedCurrency}</p>
+      
+      <select 
+        value={selectedCurrency}
+        onChange={(e) => setSelectedCurrency(e.target.value)}
+      >
+        <option value="USD">USD</option>
+        <option value="EUR">EUR</option>
+        <option value="GBP">GBP</option>
+        <option value="JPY">JPY</option>
+      </select>
+      
+      <select
+        value={selectedNetwork}
+        onChange={(e) => setSelectedNetwork(e.target.value)}
+      >
+        <option value="sepolia">Sepolia (ETH) - 1% fee</option>
+        <option value="bscTestnet">BSC Testnet (BNB) - 0.5% fee</option>
+      </select>
+      
       <button onClick={handleCryptoPayment} disabled={loading}>
         {loading ? 'Redirecting...' : 'Pay with Crypto'}
       </button>
     </div>
   );
 }
+```
 
-***
+---
 
 ## 4. Customer Payment Flow
 
 Once redirected to the BRSCPP payment page, the customer completes the following steps:
 
-### Process
+### Payment Process
 
-1. Customer visits checkout URL:
+1. **Customer visits checkout URL:**
+```
+   https://app.pp.slavy.space/checkout/ORDER-xxxx-PROD-123
+```
 
-   * `https://app.pp.slavy.space/checkout/ORDER-xxxx-PROD-123`
-2. Clicks **Get Price Quote**
-3. Chainlink Oracle fetches the live market price
-4. Crypto amount is calculated and locked for 60 seconds
-5. Customer approves the transaction in MetaMask
-6. Smart Contract splits the payment:
+2. **Connect Wallet:**
+   - Customer connects MetaMask
+   - Wallet address displayed
 
-   * **99.5% → Merchant Wallet**
-   * **0.5% → Fee Collector**
+3. **Select Network:**
+   - Sepolia Testnet (Ethereum) - 120s quote timer, 1% fee
+   - BSC Testnet (Binance) - 60s quote timer, 0.5% fee
 
-A simplified settlement diagram:
+4. **Select Token:**
+   - Native tokens: ETH or BNB
+   - Stablecoins: USDC or USDT
 
-Customer Wallet --> Gateway Contract --> |99.5%| Merchant Wallet
-                                      \-> |0.5%| Fee Collector
+5. **Create Quote:**
+   - Click "Get Quote"
+   - Chainlink Oracle fetches live market price
+   - Crypto amount calculated and locked for 60-120 seconds
+   - Timer countdown starts
 
+6. **Approve (Stablecoins only):**
+   - For USDC/USDT payments
+   - Approve token spending in MetaMask
+   - Skip this step for native tokens (ETH/BNB)
+
+7. **Confirm Payment:**
+   - Approve transaction in MetaMask
+   - Smart Contract processes payment
+   - Funds split automatically:
+     - **99.5% → Merchant Wallet** (BSC Testnet)
+     - **99.0% → Merchant Wallet** (Sepolia)
+     - Remaining → Fee Collector
+
+8. **Payment Success:**
+   - Transaction confirmed on blockchain
+   - Redirect to success page
+   - Transaction hash and explorer link provided
+
+### Settlement Flow Diagram
+```
+Customer Wallet → Gateway Contract → 99.0-99.5% → Merchant Wallet
+                                  → 0.5-1.0%    → Fee Collector
+```
+
+---
 
 ## 5. Webhook Notification
 
 Merchants receive real-time webhook events when payment is completed.
 
 ### Webhook Registration
-
-**bash**
+```bash
 curl -X POST https://api.pp.slavy.space/api/merchant/webhook \
   -H "Authorization: Bearer pk_test_a1b2..." \
   -H "Content-Type: application/json" \
@@ -201,16 +294,15 @@ curl -X POST https://api.pp.slavy.space/api/merchant/webhook \
     "webhookUrl": "https://ivanshop.com/webhook/brscpp",
     "webhookSecret": "my_secret_key_12345"
   }'
-
-***
+```
 
 ### Webhook Handler (Node.js)
-
-***javascript***
+```javascript
 const crypto = require('crypto');
 
 app.post('/webhook/brscpp', express.json(), async (req, res) => {
-  const signature = req.headers['x-webhook-signature'];
+  // Verify signature
+  const signature = req.headers['x-brscpp-signature'];
   const payload = JSON.stringify(req.body);
 
   const expectedSignature = crypto
@@ -222,71 +314,223 @@ app.post('/webhook/brscpp', express.json(), async (req, res) => {
     return res.status(401).send('Invalid signature');
   }
 
-  const { event, payment } = req.body;
+  const { event, payment, merchant, timestamp } = req.body;
 
   if (event === 'payment.completed') {
+    console.log('Payment received:', payment.orderId);
+    console.log('Amount:', payment.usdAmount, 'USD');
+    console.log('Network:', payment.network);
+    console.log('Token:', payment.tokenSymbol);
+    console.log('TX Hash:', payment.txHash);
+    
+    // Update order status
     await updateOrderStatus(payment.orderId, 'paid');
+    
+    // Deliver product/service
     await deliverProduct(payment.orderId);
+    
+    // Send confirmation email
     await sendConfirmationEmail(payment.orderId);
   }
 
   res.status(200).send('OK');
 });
-
-***
+```
 
 ### Example Webhook Payload
-
-***json***
+```json
 {
   "event": "payment.completed",
   "payment": {
     "id": "uuid-123",
     "orderId": "ORDER-1732456789-PROD-123",
-    "merchantAddress": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-    "usdAmount": 99.99,
+    "quoteId": "0x...",
     "txHash": "0xabc123def456...",
-    "timestamp": "2025-11-24T15:30:00Z"
-  }
+    "customerAddress": "0x...",
+    "merchantAddress": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+    "tokenAddress": "0x...",
+    "tokenSymbol": "USDC",
+    "tokenAmount": "100.500000",
+    "merchantAmount": "99.495000",
+    "feeAmount": "1.005000",
+    "usdAmount": 100.00,
+    "network": "sepolia",
+    "blockNumber": 12345678
+  },
+  "merchant": {
+    "id": "uuid-456",
+    "walletAddress": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+    "companyName": "Ivan's Digital Shop"
+  },
+  "timestamp": "2024-12-09T15:30:00.000Z"
 }
+```
 
-***
+---
 
 ## 6. Alternative: Polling Payment Status
 
-If the merchant cannot use webhooks, they may poll:
+If the merchant cannot use webhooks, they may poll the payment status:
 
-***javascript***
+### Polling Implementation
+```javascript
 async function checkPaymentStatus(orderId) {
-  const response = await axios.get(
-    `https://api.pp.slavy.space/api/customer/payment/${orderId}/status`
-  );
+  try {
+    const response = await axios.get(
+      `https://api.pp.slavy.space/api/customer/payment/${orderId}/status`
+    );
 
-  if (response.data.status === 'completed') {
-    await deliverProduct(orderId);
-    return true;
+    if (response.data.status === 'completed') {
+      console.log('Payment confirmed!');
+      console.log('TX Hash:', response.data.payment.txHash);
+      console.log('Explorer:', response.data.payment.explorerUrl);
+      
+      await deliverProduct(orderId);
+      return true;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('Status check failed:', error);
+    return false;
   }
-  return false;
 }
 
-***
+// Poll every 5 seconds
+const interval = setInterval(async () => {
+  const completed = await checkPaymentStatus('ORDER-123');
+  if (completed) {
+    clearInterval(interval);
+  }
+}, 5000);
+```
 
-## 7. Real-World Flow Summary
+---
 
-Customer -> Ivan's Frontend -> Ivan's Backend -> BRSCPP API -> Payment Page
-   |                                                           |
-   |                          Smart Contract Settlement        |
-   +-----------------------------> Blockchain -----------------+
-                                                             |
-                                        Webhook -> Backend -> Order Delivered
+## 7. Complete Integration Flow
+```
+Customer → Ivan's Frontend → Network Selection Modal
+                  ↓
+           Ivan's Backend
+                  ↓
+           BRSCPP API (create payment request)
+                  ↓
+           Payment Page (app.pp.slavy.space)
+                  ↓
+        Customer selects token & creates quote
+                  ↓
+        Chainlink Oracle (price feed)
+                  ↓
+        Customer confirms in MetaMask
+                  ↓
+        Smart Contract Settlement
+                  ↓
+        ├─→ 99.0-99.5% → Merchant Wallet
+        └─→ 0.5-1.0%   → Fee Collector
+                  ↓
+        Webhook → Backend → Order Fulfilled
+```
 
+---
+
+## Supported Networks and Fees
+
+| Network | Chain ID | Quote Timer | Fee | Status |
+|---------|----------|-------------|-----|--------|
+| Sepolia | 11155111 | 120 seconds | 1% | Live |
+| BSC Testnet | 97 | 60 seconds | 0.5% | Live |
+| Polygon Amoy | 80002 | 60 seconds | 1% | Deployed |
+
+---
+
+## Supported Tokens
+
+### Sepolia Testnet
+- ETH (native)
+- USDC: 0xC4De068C028127bdB44670Edb82e6E3Ff4113E49
+- USDT: 0x00D75E583DF2998C7582842e69208ad90820Eaa1
+
+### BSC Testnet
+- BNB (native)
+- USDC: 0x45787D76D24F3b47663eC3DEcc76f46C20Fa0c4C
+- USDT: 0xb6dFe9F6810955A3bcbdf7F99418C95Cb073F23D
+
+---
+
+## Supported Fiat Currencies
+
+Merchants can price products in any of these currencies (automatic USD conversion):
+
+USD, EUR, GBP, JPY, CNY, RUB, INR, CAD, AUD, BRL, MXN, KRW
+
+---
+
+## Testing Resources
+
+### Test Token Faucets
+Access free test tokens: https://pp.slavy.space/faucets
+
+- USDC: 10,000 per claim (24h cooldown)
+- USDT: 10,000 per claim (24h cooldown)
+
+Available on Sepolia and BSC Testnet.
+
+### Test Shop Demo
+Try the complete flow: https://testshop.pp.slavy.space
+
+---
+
+## API Reference
+
+Full API documentation: https://pp.slavy.space/docs
+
+**Key Endpoints:**
+- POST `/api/merchant/payment-request` - Create payment
+- GET `/api/customer/payment/:orderId` - Get payment details
+- GET `/api/customer/payment/:orderId/status` - Check status
+- POST `/api/merchant/webhook` - Configure webhook
+- GET `/api/merchant/payments` - List payments
+
+---
+
+## Error Handling
+
+### Common Error Codes
+
+| Code | Error | Solution |
+|------|-------|----------|
+| 400 | Bad Request | Check required parameters |
+| 401 | Unauthorized | Verify API key |
+| 404 | Not Found | Check order ID |
+| 410 | Gone | Quote expired, create new one |
+| 429 | Too Many Requests | Rate limit exceeded |
+| 500 | Internal Error | Contact support |
+
+### Example Error Response
+```json
+{
+  "error": "Invalid API key",
+  "message": "The provided API key is invalid or expired",
+  "timestamp": "2024-12-09T15:30:00.000Z"
+}
+```
+
+---
 
 ## Need Assistance?
 
-If you need help integrating BRSCPP, contact the support team via:
+If you need help integrating BRSCPP, contact the support team:
 
-* Main site: [https://pp.slavy.space](https://pp.slavy.space)
-* Dev contact: [https://me.slavy.space](https://me.slavy.space)
+- **Main Site:** https://pp.slavy.space
+- **Documentation:** https://pp.slavy.space/docs
+- **Integration Guide:** https://pp.slavy.space/integration
+- **Developer Contact:** https://me.slavy.space
+- **Demo Video:** https://youtube.com/watch?v=3n2e2H9aXAw
 
+---
 
 **This DEV_SUPPORT document is intended for developers who need a clear, technical, production-ready integration reference for BRSCPP.**
+
+---
+
+Last Updated: December 2025
