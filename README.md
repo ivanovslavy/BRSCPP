@@ -2,7 +2,7 @@
 
 A non-custodial Web3 payment infrastructure for instant cryptocurrency settlements without KYC. Direct wallet-to-wallet settlement system with price-locked quotes using Chainlink Oracles.
 
-**Current Status:** Live Beta Testing (December 2024)
+**Current Status:** Live Beta Testing (December 2025)
 
 **Networks:** Sepolia Testnet, BSC Testnet
 
