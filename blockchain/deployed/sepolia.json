@@ -1,0 +1,31 @@
+{
+  "network": "sepolia",
+  "chainId": "11155111",
+  "timestamp": "2025-11-21T10:07:38.914Z",
+  "deployer": "0x2786e48814C2E562A92aE53187b848DBB312d1a4",
+  "contracts": {
+    "MockUSDC": "0xC4De068C028127bdB44670Edb82e6E3Ff4113E49",
+    "MockUSDT": "0x00D75E583DF2998C7582842e69208ad90820Eaa1",
+    "CryptoPaymentGateway": "0x1378329ABE689594355a95bDAbEaBF015ef9CF39",
+    "MaliciousAttacker": "0xc41890712A046a92b732cfFD9073bEd223C55dDA"
+  },
+  "priceFeeds": {
+    "ETH_USD": "0x694AA1769357215DE4FAC081bf1f309aDC325306",
+    "USDC_USD": "0xA2F78ab2355fe2f984D808B5CeE7FD0A93D5270E",
+    "USDT_USD": "0xA2F78ab2355fe2f984D808B5CeE7FD0A93D5270E"
+  },
+  "config": {
+    "owner": "0x2786e48814C2E562A92aE53187b848DBB312d1a4",
+    "feeCollector": "0x3A9Da2349caE432F46A04737d5F4c5EF9ef11973",
+    "feePercentage": "50"
+  },
+  "maliciousAttacker": {
+    "address": "0xc41890712A046a92b732cfFD9073bEd223C55dDA",
+    "owner": "0x8eB8Bf106EbC9834a2586D04F73866C7436Ce298",
+    "targetGateway": "0x1378329ABE689594355a95bDAbEaBF015ef9CF39",
+    "deployedAt": "2025-11-21T10:15:37.782Z",
+    "funded": "0.1 ETH",
+    "verified": true,
+    "verifiedAt": "2025-11-21T10:16:02.693Z"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "network": "sepolia",
+  "timestamp": "2025-11-21T08:29:13.401Z",
+  "oracles": {
+    "ETH": {
+      "primary": "0x694AA1769357215DE4FAC081bf1f309aDC325306",
+      "secondary": "0xDe1B10a4d690A5D95802617aB75781830d259FA1",
+      "primaryPrice": "$2000 (Chainlink)",
+      "secondaryPrice": "$2010 (Mock)"
+    },
+    "USDC": {
+      "primary": "0xA2F78ab2355fe2f984D808B5CeE7FD0A93D5270E",
+      "secondary": "0x0b59725cb461a5F81352E239B4Ccf546e10712A9",
+      "primaryPrice": "$1.00 (Chainlink)",
+      "secondaryPrice": "$0.999 (Mock)"
+    },
+    "USDT": {
+      "primary": "0xA2F78ab2355fe2f984D808B5CeE7FD0A93D5270E",
+      "secondary": "0x1242e5E20d585891832d5Dd000585ee8A42531c8",
+      "primaryPrice": "$1.00 (Chainlink)",
+      "secondaryPrice": "$1.001 (Mock)"
+    }
+  }
+}

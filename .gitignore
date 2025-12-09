@@ -1,0 +1,155 @@
+# ==============================================================================
+# BRSCPP Project - GitHub Configuration
+# ==============================================================================
+# Includes:
+# - Smart contracts + deployments + slither report
+# - Test Shop (full source: frontend + backend)
+# - All README documentation
+# - Excludes private backend API and payment/marketing apps
+# ==============================================================================
+
+# ----------------------------------------------------------------------
+# GLOBAL EXCLUSION (Exclude everything by default)
+# ----------------------------------------------------------------------
+*
+*/
+
+# ----------------------------------------------------------------------
+# ROOT LEVEL FILES
+# ----------------------------------------------------------------------
+!LICENSE
+!README.md
+!DEV_SUPPORT
+!.gitignore
+
+# ----------------------------------------------------------------------
+# BLOCKCHAIN (Smart Contracts)
+# ----------------------------------------------------------------------
+!blockchain/
+!blockchain/LICENSE
+!blockchain/README.md
+!blockchain/hardhat.config.js
+!blockchain/package.json
+!blockchain/slither_report.json
+
+# Contracts (source code)
+!blockchain/contracts/
+!blockchain/contracts/**
+
+# Deployments (contract addresses)
+!blockchain/deployed/
+!blockchain/deployed/**
+
+# EXCLUDE: Generated artifacts, cache, dependencies
+blockchain/artifacts/
+blockchain/cache/
+blockchain/ignition/
+blockchain/scripts/
+blockchain/test-results/
+blockchain/tested/
+blockchain/venv/
+blockchain/slither_env/
+blockchain/node_modules/
+blockchain/package-lock.json
+
+# ----------------------------------------------------------------------
+# BACKEND
+# ----------------------------------------------------------------------
+!backend/
+
+# BRSCPP Backend (README only)
+!backend/brscpp_backend/
+!backend/brscpp_backend/README.md
+
+# Test Shop Backend (FULL SOURCE)
+!backend/testshop_backend/
+!backend/testshop_backend/README.md
+!backend/testshop_backend/LICENSE
+!backend/testshop_backend/server.js
+!backend/testshop_backend/package.json
+
+# EXCLUDE: Dependencies, backups, env files
+backend/testshop_backend/node_modules/
+backend/testshop_backend/package-lock.json
+backend/testshop_backend/.env
+backend/testshop_backend/*.back
+backend/**/node_modules/
+backend/**/.env
+
+# ----------------------------------------------------------------------
+# FRONTEND
+# ----------------------------------------------------------------------
+!frontend/
+
+# Marketing Site (README only)
+!frontend/marketing_app/
+!frontend/marketing_app/README.md
+
+# Payment App (README only)
+!frontend/payment_app/
+!frontend/payment_app/README.md
+
+# Test Shop Frontend (FULL SOURCE)
+!frontend/testshop_app/
+!frontend/testshop_app/README.md
+!frontend/testshop_app/index.html
+!frontend/testshop_app/package.json
+!frontend/testshop_app/vite.config.js
+!frontend/testshop_app/tailwind.config.js
+!frontend/testshop_app/postcss.config.js
+!frontend/testshop_app/eslint.config.js
+
+# Test Shop - src directory
+!frontend/testshop_app/src/
+!frontend/testshop_app/src/**
+
+# Test Shop - public directory
+!frontend/testshop_app/public/
+!frontend/testshop_app/public/**
+
+# EXCLUDE: Build artifacts, dependencies
+frontend/testshop_app/dist/
+frontend/testshop_app/node_modules/
+frontend/testshop_app/package-lock.json
+frontend/**/dist/
+frontend/**/node_modules/
+frontend/**/.env
+
+# ----------------------------------------------------------------------
+# ENVIRONMENT & SECRETS
+# ----------------------------------------------------------------------
+.env
+.env.*
+*.log
+*.key
+*.pem
+
+# ----------------------------------------------------------------------
+# DEPENDENCIES
+# ----------------------------------------------------------------------
+node_modules/
+**/node_modules/
+package-lock.json
+**/package-lock.json
+
+# ----------------------------------------------------------------------
+# BUILD ARTIFACTS
+# ----------------------------------------------------------------------
+dist/
+**/dist/
+build/
+**/build/
+
+# ----------------------------------------------------------------------
+# OS & EDITOR
+# ----------------------------------------------------------------------
+.DS_Store
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# ==============================================================================
+# END OF CONFIGURATION
+# ==============================================================================

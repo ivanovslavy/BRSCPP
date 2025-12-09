@@ -1,0 +1,21 @@
+{
+  "network": "sepolia",
+  "timestamp": "2025-11-29T07:41:50.186Z",
+  "results": [
+    {
+      "contract": "CryptoPaymentGateway",
+      "address": "0x1378329ABE689594355a95bDAbEaBF015ef9CF39",
+      "status": "success"
+    },
+    {
+      "contract": "MockUSDC",
+      "address": "0xC4De068C028127bdB44670Edb82e6E3Ff4113E49",
+      "status": "success"
+    },
+    {
+      "contract": "MockUSDT",
+      "address": "0x00D75E583DF2998C7582842e69208ad90820Eaa1",
+      "status": "success"
+    }
+  ]
+}

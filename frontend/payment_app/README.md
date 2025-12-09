@@ -1,79 +1,472 @@
 # BRSCPP Payment Application
 
-Customer-facing cryptocurrency payment checkout interface.
+Customer-facing checkout application for completing cryptocurrency payments.
 
-## Technology Stack
+**Application URL:** https://app.pp.slavy.space
 
-- React 18
-- Vite 7
-- TailwindCSS 3
-- React Router DOM 6
-- ethers.js 6
-- Sonner (toast notifications)
+**Status:** Live (Production)
 
-## Project Structure
+---
 
+## Navigation
+
+- [Main Project README](../../README.md)
+- [Smart Contracts Documentation](../../blockchain/README.md)
+- [BRSCPP Backend](../../backend/brscpp_backend/README.md)
+- [Test Shop Backend](../../backend/testshop_backend/README.md)
+- [Marketing Site](../marketing_app/README.md)
+- [Test Shop Frontend](../testshop_app/README.md)
+
+---
+
+## Overview
+
+Payment application handles the complete customer checkout flow from quote creation to payment confirmation. Customers connect their wallet, select network and token, create price-locked quotes, and complete payments.
+
+### Purpose
+
+- Multi-chain payment processing
+- Price-locked quotes with countdown timers
+- Native and stablecoin support
+- Real-time payment status tracking
+- Transaction verification and confirmation
+
+### Key Features
+
+- MetaMask wallet integration
+- Multi-network support (Sepolia, BSC Testnet)
+- Multi-token support (Native, USDC, USDT)
+- Quote creation with 60-120 second timers
+- Token approval flow for stablecoins
+- Payment confirmation with explorer links
+- Responsive mobile-friendly design
+
+---
+
+## Architecture
+
+### Technology Stack
+
+**Framework:** React 18 with Vite
+
+**Styling:** TailwindCSS
+
+**Routing:** React Router v6
+
+**Blockchain:** ethers.js v6
+
+**State Management:** React Context API
+
+**Build Tool:** Vite
+
+### Application Flow
+```
+Customer arrives at payment URL
+         ↓
+┌─────────────────────────┐
+│  Load Payment Request   │
+│  GET /api/customer/     │
+│      payment/:orderId   │
+└───────────┬─────────────┘
+            ↓
+┌─────────────────────────┐
+│  Connect Wallet         │
+│  MetaMask Integration   │
+└───────────┬─────────────┘
+            ↓
+┌─────────────────────────┐
+│  Select Network         │
+│  Sepolia / BSC Testnet  │
+└───────────┬─────────────┘
+            ↓
+┌─────────────────────────┐
+│  Select Token           │
+│  ETH/BNB/USDC/USDT      │
+└───────────┬─────────────┘
+            ↓
+┌─────────────────────────┐
+│  Create Quote           │
+│  lockPriceQuote()       │
+│  Timer: 60-120s         │
+└───────────┬─────────────┘
+            ↓
+┌─────────────────────────┐
+│  Approve (Stablecoins)  │
+│  approve() if needed    │
+└───────────┬─────────────┘
+            ↓
+┌─────────────────────────┐
+│  Confirm Payment        │
+│  Send transaction       │
+└───────────┬─────────────┘
+            ↓
+┌─────────────────────────┐
+│  Payment Success        │
+│  Transaction confirmed  │
+└─────────────────────────┘
+```
+
+### Component Structure
+```
 payment-app/
 ├── src/
-│   ├── components/
-│   │   ├── WalletConnect.jsx      # MetaMask connection
-│   │   ├── TokenSelector.jsx      # Payment token selection
-│   │   ├── CountdownTimer.jsx     # Quote expiration timer
-│   │   └── TransactionStatus.jsx  # Transaction state display
 │   ├── pages/
-│   │   ├── Checkout.jsx           # Payment checkout flow
-│   │   ├── Success.jsx            # Payment success page
-│   │   ├── Failed.jsx             # Payment failure page
-│   │   └── Dashboard.jsx          # Merchant dashboard
-│   ├── App.jsx                    # Root component with routing
-│   ├── main.jsx                   # Application entry point
-│   └── index.css                  # Tailwind CSS imports
-├── public/                        # Static assets
-├── dist/                          # Production build output
-├── package.json
-├── vite.config.js
-└── tailwind.config.js
+│   │   ├── Checkout.jsx      Main payment flow
+│   │   ├── Success.jsx       Payment confirmed
+│   │   └── Error.jsx         Payment failed
+│   ├── components/
+│   │   ├── WalletConnect.jsx Wallet connection
+│   │   ├── NetworkSelector.jsx Network switching
+│   │   ├── TokenSelector.jsx Token selection
+│   │   ├── QuoteTimer.jsx    Countdown timer
+│   │   └── PaymentStatus.jsx Status display
+│   ├── contexts/
+│   │   └── WalletContext.jsx Wallet state
+│   ├── utils/
+│   │   ├── contracts.js      Contract ABIs
+│   │   └── networks.js       Network configs
+│   ├── App.jsx               Main component
+│   ├── main.jsx              Entry point
+│   └── index.css             Global styles
+├── public/                   Static assets
+├── package.json              Dependencies
+├── vite.config.js            Vite config
+└── README.md                 This file
+```
+
+---
+
+## Pages
+
+### Checkout Page
+
+**Route:** `/checkout/:orderId`
+
+**Purpose:** Complete payment flow
+
+**Sections:**
+
+1. **Payment Header**
+   - Order ID display
+   - Amount in USD
+   - Merchant name
+
+2. **Wallet Connection**
+   - Connect MetaMask button
+   - Connected address display
+   - Network status indicator
+
+3. **Network Selection**
+   - Sepolia Testnet
+   - BSC Testnet
+   - Auto-switch functionality
+
+4. **Token Selection**
+   - Native tokens (ETH, BNB)
+   - Stablecoins (USDC, USDT)
+   - Balance display
+
+5. **Quote Creation**
+   - Lock price button
+   - Timer countdown (60-120s)
+   - Token amount display
+   - Exchange rate display
+
+6. **Payment Flow**
+   - Approve button (stablecoins only)
+   - Confirm payment button
+   - Transaction status
+   - Progress indicators
+
+7. **Debug Panel** (development)
+   - Event logs
+   - State inspection
+   - Error messages
+
+**State Management:**
+```javascript
+const [paymentRequest, setPaymentRequest] = useState(null);
+const [wallet, setWallet] = useState({ address: '', signer: null });
+const [selectedNetwork, setSelectedNetwork] = useState('sepolia');
+const [selectedToken, setSelectedToken] = useState(null);
+const [quote, setQuote] = useState(null);
+const [paymentStatus, setPaymentStatus] = useState(null);
+```
+
+### Success Page
+
+**Route:** `/success/:orderId`
+
+**Purpose:** Payment confirmation
+
+**Features:**
+- Success icon and message
+- Order details display
+- Amount and network info
+- Transaction hash
+- Block explorer link
+- Return to merchant button
+
+**Data Display:**
+```javascript
+{
+  orderId: "ORDER-123",
+  amountUsd: "100.00",
+  network: "Sepolia Testnet",
+  transactionHash: "0x...",
+  explorerUrl: "https://sepolia.etherscan.io/tx/0x..."
+}
+```
+
+### Error Page
+
+**Route:** `/error/:orderId`
+
+**Purpose:** Error handling
+
+**Features:**
+- Error icon and message
+- Error details
+- Troubleshooting tips
+- Retry button
+- Support contact link
+
+---
+
+## Network Configuration
+
+### Supported Networks
+
+**Sepolia Testnet**
+```javascript
+{
+  chainId: 11155111,
+  name: 'Sepolia Testnet',
+  nativeToken: 'ETH',
+  gateway: '0x1378329ABE689594355a95bDAbEaBF015ef9CF39',
+  usdc: '0xC4De068C028127bdB44670Edb82e6E3Ff4113E49',
+  usdt: '0x00D75E583DF2998C7582842e69208ad90820Eaa1',
+  explorerUrl: 'https://sepolia.etherscan.io',
+  quoteTimer: 120, // seconds
+  fee: 1.0 // percent
+}
+```
+
+**BSC Testnet**
+```javascript
+{
+  chainId: 97,
+  name: 'BSC Testnet',
+  nativeToken: 'BNB',
+  gateway: '0x0E2878bC634Ac0c1C4d3dA22CFb171Fb67a2d6e7',
+  usdc: '0x45787D76D24F3b47663eC3DEcc76f46C20Fa0c4C',
+  usdt: '0xb6dFe9F6810955A3bcbdf7F99418C95Cb073F23D',
+  explorerUrl: 'https://testnet.bscscan.com',
+  quoteTimer: 60, // seconds
+  fee: 0.5 // percent
+}
+```
+
+### Network Switching
+```javascript
+async function switchNetwork(chainId) {
+  await window.ethereum.request({
+    method: 'wallet_switchEthereumChain',
+    params: [{ chainId: `0x${chainId.toString(16)}` }]
+  });
+}
+```
+
+---
+
+## Smart Contract Integration
+
+### Gateway Contract ABI
+```javascript
+const GATEWAY_ABI = [
+  "function lockPriceQuote(address token, uint256 amountUsdCents) external returns (bytes32)",
+  "function getQuote(bytes32 quoteId) external view returns (tuple(address creator, address token, uint256 tokenAmount, uint256 amountUsdCents, uint256 validUntil, bool used))",
+  "function processPayment(bytes32 quoteId, address merchant, string memory orderId) external payable"
+];
+```
+
+### Token Contract ABI
+```javascript
+const ERC20_ABI = [
+  "function balanceOf(address) view returns (uint256)",
+  "function decimals() view returns (uint8)",
+  "function approve(address spender, uint256 amount) returns (bool)",
+  "function allowance(address owner, address spender) view returns (uint256)"
+];
+```
+
+### Quote Creation Flow
+```javascript
+// Create quote
+const gateway = new ethers.Contract(
+  GATEWAY_ADDRESS,
+  GATEWAY_ABI,
+  signer
+);
+
+const tx = await gateway.lockPriceQuote(
+  tokenAddress,
+  amountUsdCents,
+  { gasLimit: 350000 }
+);
+
+const receipt = await tx.wait();
+const event = receipt.logs.find(
+  log => log.topics[0] === QUOTE_EVENT_TOPIC
+);
+
+const quoteId = event.topics[1];
+```
+
+### Payment Execution
+
+**Native Token (ETH/BNB):**
+```javascript
+const tx = await gateway.processPayment(
+  quoteId,
+  merchantAddress,
+  orderId,
+  {
+    value: tokenAmount,
+    gasLimit: 250000
+  }
+);
+
+await tx.wait();
+```
+
+**Stablecoins (USDC/USDT):**
+```javascript
+// Step 1: Approve
+const token = new ethers.Contract(
+  tokenAddress,
+  ERC20_ABI,
+  signer
+);
+
+const approveTx = await token.approve(
+  gatewayAddress,
+  tokenAmount,
+  { gasLimit: 100000 }
+);
+
+await approveTx.wait();
+
+// Step 2: Payment
+const paymentTx = await gateway.processPayment(
+  quoteId,
+  merchantAddress,
+  orderId,
+  { gasLimit: 250000 }
+);
+
+await paymentTx.wait();
+```
+
+---
+
+## Configuration
+
+### Environment Variables
+```bash
+# API Configuration
+VITE_API_URL=https://api.pp.slavy.space
+
+# Network Configuration
+VITE_SEPOLIA_GATEWAY=0x1378329ABE689594355a95bDAbEaBF015ef9CF39
+VITE_BSC_GATEWAY=0x0E2878bC634Ac0c1C4d3dA22CFb171Fb67a2d6e7
+
+# Feature Flags
+VITE_DEBUG_MODE=false
+VITE_ENABLE_POLYGON=false
+```
+
+### Vite Configuration
+```javascript
+export default {
+  server: {
+    port: 3051,
+    host: '0.0.0.0'
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'ethers': ['ethers']
+        }
+      }
+    }
+  }
+}
+```
+
+---
 
 ## Installation
-**bash**
+
+### Prerequisites
+```bash
+Node.js >= 18.x
+npm or yarn
+MetaMask browser extension
+```
+
+### Setup Steps
+```bash
+# Navigate to directory
 cd ~/pp/frontend/payment-app
+
+# Install dependencies
 npm install
 
-## Development
-**bash**
+# Configure environment
+cp .env.example .env
+nano .env
+
+# Start development server
 npm run dev
 
-Server runs on http://localhost:3051
-
-## Production Build
-**bash**
+# Build for production
 npm run build
-npm run preview
 
-Build output in `dist/` directory.
+# Preview production build
+npm run preview
+```
+
+### Dependencies
+```json
+{
+  "react": "^18.2.0",
+  "react-dom": "^18.2.0",
+  "react-router-dom": "^6.20.0",
+  "ethers": "^6.9.0",
+  "vite": "^5.0.0",
+  "tailwindcss": "^3.3.0"
+}
+```
+
+---
 
 ## Deployment
 
-Site runs as systemd service on port 3051.
+### Build Process
+```bash
+cd ~/pp/frontend/payment-app
+npm run build
+```
 
-### Service Management
-**bash**
-# Start service
-sudo systemctl start brscpp-payment-app.service
+### Systemd Service
 
-# Stop service
-sudo systemctl stop brscpp-payment-app.service
-
-# Restart service
-sudo systemctl restart brscpp-payment-app.service
-
-# View logs
-sudo journalctl -u brscpp-payment-app.service -f
-
-### Service Configuration
-
-Location: `/etc/systemd/system/brscpp-payment-app.service`
-**ini**
+**Service File:** `/etc/systemd/system/brscpp-payment-app.service`
+```ini
 [Unit]
 Description=BRSCPP Payment Application
 After=network.target
@@ -82,234 +475,346 @@ After=network.target
 Type=simple
 User=slavy
 WorkingDirectory=/home/slavy/pp/frontend/payment-app
-Environment="NODE_ENV=production"
-Environment="PORT=3051"
-ExecStart=/usr/bin/npm run preview -- --port 3051 --host 0.0.0.0
+ExecStart=/usr/bin/npm run preview -- --host 0.0.0.0 --port 3051
 Restart=always
 RestartSec=10
+Environment=NODE_ENV=production
 
 [Install]
 WantedBy=multi-user.target
+```
 
-## Pages
+### Service Management
+```bash
+# Rebuild and restart
+cd ~/pp/frontend/payment-app
+npm run build
+sudo systemctl restart brscpp-payment-app.service
 
-### Checkout (/checkout/:orderId)
-Main payment flow:
-1. Display payment request details
-2. Connect wallet (MetaMask)
-3. Select payment token (ETH, USDC, USDT)
-4. Create price quote on blockchain
-5. Display quote with countdown timer
-6. Send payment transaction
-7. Confirm and redirect to success
+# Check status
+sudo systemctl status brscpp-payment-app.service
 
-### Success (/success/:orderId)
-Payment confirmation page with transaction details and Etherscan link.
+# View logs
+sudo journalctl -u brscpp-payment-app.service -f
+```
 
-### Failed (/failed/:orderId)
-Payment failure page with error message and retry option.
+### Nginx Configuration
+```nginx
+server {
+    listen 443 ssl;
+    server_name app.pp.slavy.space;
 
-### Dashboard (/dashboard)
-Merchant dashboard with:
-- Payment statistics
-- API key management
-- Integration code examples
-- Recent payment history
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
 
-## Payment Flow
+    root /home/slavy/pp/frontend/payment-app/dist;
+    index index.html;
 
-### Step 1: Load Payment Request
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
 
-GET /api/customer/payment/:orderId
+    location /api {
+        proxy_pass https://api.pp.slavy.space;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
 
-Returns merchant info, amount, description.
+---
 
-### Step 2: Connect Wallet
-User connects MetaMask wallet. Application checks network and switches to Sepolia if needed.
+## User Experience
 
-### Step 3: Create Quote
-Customer wallet calls smart contract directly:
-**javascript**
-lockPriceQuote(token, usdAmount)
-***
+### Payment Flow Steps
 
-Returns quote ID, token amount, and expiration time. Quote valid for 60 seconds.
+**1. Customer Arrives**
+- URL: https://app.pp.slavy.space/checkout/ORDER-123
+- Order details loaded from API
+- Amount displayed in USD
 
-### Step 4: Send Payment
-Customer wallet calls smart contract:
-**javascript**
-processETHPaymentWithQuote(quoteId, merchant, orderId)
-***
+**2. Connect Wallet**
+- Click "Connect Wallet" button
+- MetaMask popup appears
+- Approve connection
+- Wallet address displayed
 
-Sends ETH to gateway, which splits between merchant and fee collector.
+**3. Select Network**
+- Choose Sepolia or BSC Testnet
+- MetaMask switches network
+- Contract addresses updated
 
-### Step 5: Confirmation
-Transaction confirmed on blockchain. Backend event listener processes payment and updates database.
+**4. Select Token**
+- View available tokens
+- See current balance
+- Select ETH/BNB/USDC/USDT
 
-## Smart Contract Integration
+**5. Create Quote**
+- Click "Get Quote" button
+- Transaction sent to blockchain
+- Quote locked for 60-120 seconds
+- Timer countdown starts
 
-### Gateway Address
+**6. Approve (if stablecoin)**
+- Click "Approve USDC/USDT"
+- MetaMask approval popup
+- Confirm approval
+- Wait for confirmation
 
-Sepolia: 0x1378329ABE689594355a95bDAbEaBF015ef9CF39
+**7. Confirm Payment**
+- Click "Confirm Payment"
+- MetaMask payment popup
+- Confirm transaction
+- Wait for blockchain confirmation
 
-### ABI Functions
-**javascript**
-lockPriceQuote(address token, uint256 usdAmount)
-processETHPaymentWithQuote(bytes32 quoteId, address merchant, string orderId)
-priceQuotes(bytes32) view returns (...)
-***
+**8. Success**
+- Redirect to success page
+- Show transaction hash
+- Link to block explorer
+- Option to return to merchant
 
-### Events
-**javascript**
-PriceQuoteGenerated(bytes32 quoteId, address token, ...)
-PaymentProcessed(uint256 paymentId, bytes32 quoteId, ...)
-***
-
-## Features
-
-- Dark theme matching marketing site
-- Responsive mobile-first design
-- Real-time transaction status updates
-- Debug log panel (desktop only)
-- Automatic network switching
-- Quote expiration countdown
-- MetaMask integration
-- Transaction error handling
-
-## Configuration
-
-### Vite Config
-**javascript**
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 3051,
-    host: '0.0.0.0'
-  },
-  preview: {
-    port: 3051,
-    host: '0.0.0.0',
-    allowedHosts: ['app.pp.slavy.space', 'localhost']
-  }
-})
-
-***
-
-### API Endpoints
-**javascript**
-const API_BASE = 'https://api.pp.slavy.space';
-const GATEWAY_ADDRESS = '0x1378329ABE689594355a95bDAbEaBF015ef9CF39';
-***
-
-## Debug Mode
-
-Desktop view includes debug log panel showing:
-- Wallet connection events
-- Quote creation details
-- Transaction submission
-- Blockchain confirmation
-- Error messages
-
-Useful for troubleshooting payment issues.
-
-## Security
-
-- No private keys stored
-- Transactions signed by user wallet
-- Quote creator validation prevents front-running
-- Quote expiration prevents stale prices
-- Amount verification on-chain
-- One-time quote usage
+---
 
 ## Error Handling
 
 ### Common Errors
 
-**InvalidQuoteCreator**
-Quote must be used by wallet that created it.
+**Wallet Not Connected**
+```
+Error: "Please connect your wallet"
+Action: Show connect button
+```
 
-**QuoteExpired**
-Quote valid for 60 seconds. Create new quote.
+**Wrong Network**
+```
+Error: "Please switch to Sepolia"
+Action: Show network selector
+```
 
-**QuoteAlreadyUsed**
-Each quote can only be used once.
+**Insufficient Balance**
+```
+Error: "Insufficient ETH balance"
+Action: Display required amount
+```
 
-**AmountMismatch**
-Payment amount must match quote amount exactly.
+**Quote Expired**
+```
+Error: "Quote expired. Please create a new quote"
+Action: Reset quote state
+```
 
-**Network Error**
-User must be on Sepolia testnet.
+**Transaction Rejected**
+```
+Error: "Transaction cancelled by user"
+Action: Allow retry
+```
 
-## Browser Support
+**Gas Estimation Failed**
+```
+Error: "Transaction may fail"
+Action: Show warning, allow override
+```
 
-- Chrome 90+ (recommended)
-- Firefox 88+
-- Safari 14+
-- Edge 90+
+### Error Display
+```javascript
+{
+  error && (
+    <div className="bg-status-error bg-opacity-10 border border-status-error rounded-lg p-4">
+      <p className="text-status-error">{error}</p>
+    </div>
+  )
+}
+```
 
-Requires MetaMask extension or mobile wallet browser.
-
-## Mobile Wallet Support
-
-App works with:
-- MetaMask Mobile
-- Trust Wallet
-- Coinbase Wallet
-- Rainbow Wallet
-
-Open payment URL in wallet's browser.
+---
 
 ## Testing
 
-### Create Test Payment
-**bash**
-curl -X POST https://api.pp.slavy.space/api/merchant/payment-request \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "orderId": "TEST-'$(date +%s)'",
-    "amountUsd": "10",
-    "description": "Test payment"
-  }'
+### Manual Testing Checklist
 
-***
+**Wallet Connection:**
+- [ ] Connect MetaMask
+- [ ] Display wallet address
+- [ ] Show current network
+- [ ] Disconnect and reconnect
 
-Returns payment URL. Open in browser to test checkout flow.
+**Network Switching:**
+- [ ] Switch to Sepolia
+- [ ] Switch to BSC Testnet
+- [ ] Verify contract addresses update
+- [ ] Check token list updates
 
-### Get Testnet ETH
+**Quote Creation:**
+- [ ] Create quote with ETH
+- [ ] Create quote with USDC
+- [ ] Verify timer starts
+- [ ] Test quote expiration
 
-https://sepoliafaucet.com
+**Payment Flow:**
+- [ ] Native token payment (no approval)
+- [ ] Stablecoin approval
+- [ ] Stablecoin payment
+- [ ] Verify transaction hash
+
+**Error Scenarios:**
+- [ ] Insufficient balance
+- [ ] Rejected transaction
+- [ ] Expired quote
+- [ ] Network timeout
+
+### Test URLs
+```bash
+# Development
+http://localhost:3051/checkout/TEST-ORDER-123
+
+# Production
+https://app.pp.slavy.space/checkout/TEST-ORDER-123
+```
+
+---
+
+## Performance
+
+### Optimization
+
+- Code splitting by route
+- Lazy loading components
+- Memoized calculations
+- Debounced API calls
+- Cached network configs
+
+### Bundle Size
+```
+Total: ~450KB
+React: ~130KB
+ethers.js: ~120KB
+Router: ~30KB
+Application: ~170KB
+```
+
+### Load Times
+
+- Initial load: <2s
+- Quote creation: <5s
+- Payment confirmation: <15s (blockchain dependent)
+
+---
+
+## Browser Support
+
+### Tested Configurations
+
+**Recommended:**
+- Firefox (latest) + MetaMask
+- Ubuntu Desktop
+
+**Also Tested:**
+- Chrome (latest) + MetaMask
+- Edge (latest) + MetaMask
+
+### Requirements
+
+- JavaScript enabled
+- MetaMask extension installed
+- Web3 provider available
+- Popup windows allowed
+
+---
 
 ## Troubleshooting
 
-### Transaction Fails
-- Check Sepolia network selected
-- Verify sufficient ETH balance
-- Ensure quote not expired
-- Use same wallet that created quote
+### MetaMask Issues
 
-### CSS Not Loading
-**bash**
-rm -rf dist node_modules/.vite
-npm run build
-sudo systemctl restart brscpp-payment-app.service
-***
+**Not Connecting:**
+```javascript
+// Check MetaMask availability
+if (typeof window.ethereum === 'undefined') {
+  alert('Please install MetaMask');
+}
 
-### MetaMask Not Detected
-**bash**
-# Check console for errors
-# Install MetaMask extension
-# Refresh page after installation
-***
+// Request accounts
+const accounts = await window.ethereum.request({
+  method: 'eth_requestAccounts'
+});
+```
 
-## Links
+**Network Switch Failing:**
+```javascript
+// Try switching
+try {
+  await window.ethereum.request({
+    method: 'wallet_switchEthereumChain',
+    params: [{ chainId: '0xaa36a7' }]
+  });
+} catch (error) {
+  if (error.code === 4902) {
+    // Network not added
+    await window.ethereum.request({
+      method: 'wallet_addEthereumChain',
+      params: [NETWORK_PARAMS]
+    });
+  }
+}
+```
 
-- Production: https://app.pp.slavy.space
-- API: https://api.pp.slavy.space
-- Marketing: https://pp.slavy.space
-- Etherscan: https://sepolia.etherscan.io
-- GitHub: https://github.com/ivanovslavy/BRSCPP
+### Transaction Failures
+
+**Check Gas:**
+```javascript
+const gasEstimate = await tx.estimateGas();
+console.log('Gas estimate:', gasEstimate.toString());
+```
+
+**Check Balance:**
+```javascript
+const balance = await provider.getBalance(address);
+console.log('Balance:', ethers.formatEther(balance));
+```
+
+**Check Allowance:**
+```javascript
+const allowance = await token.allowance(owner, spender);
+console.log('Allowance:', ethers.formatUnits(allowance, 6));
+```
+
+---
+
+## Future Enhancements
+
+### Planned Features
+
+- WalletConnect support
+- Ledger hardware wallet support
+- Multi-language support
+- QR code payments (mobile)
+- Payment history
+- Saved payment methods
+- Email receipts
+
+### UX Improvements
+
+- Estimated gas display
+- Transaction preview
+- Better error messages
+- Loading state animations
+- Mobile optimization
+
+---
+
+## Related Documentation
+
+- [Main Project](../../README.md)
+- [BRSCPP Backend](../../backend/brscpp_backend/README.md)
+- [Smart Contracts](../../blockchain/README.md)
+- [Marketing Site](../marketing_app/README.md)
+- [Test Shop Frontend](../testshop_app/README.md)
+
+---
 
 ## License
 
-MIT
+MIT License
+
+---
+
+Last Updated: December 2025

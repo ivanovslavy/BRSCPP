@@ -1,0 +1,14 @@
+{
+  "contractName": "TokenFaucet",
+  "address": "0xFB370f6c9Bd1dbc7dB6c202D5B9e6B8F30273c00",
+  "network": "sepolia",
+  "deployer": "0x2786e48814C2E562A92aE53187b848DBB312d1a4",
+  "constructorArgs": [
+    "0xC4De068C028127bdB44670Edb82e6E3Ff4113E49",
+    "0x00D75E583DF2998C7582842e69208ad90820Eaa1"
+  ],
+  "initialFundAmount": "10000000 (6 decimals)",
+  "USDC_Address": "0xC4De068C028127bdB44670Edb82e6E3Ff4113E49",
+  "USDT_Address": "0x00D75E583DF2998C7582842e69208ad90820Eaa1",
+  "verificationCommand": "npx hardhat verify --network sepolia 0xFB370f6c9Bd1dbc7dB6c202D5B9e6B8F30273c00 0xC4De068C028127bdB44670Edb82e6E3Ff4113E49 0x00D75E583DF2998C7582842e69208ad90820Eaa1"
+}
