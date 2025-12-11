@@ -343,7 +343,7 @@ Enhance frontend applications with focus on UI/UX excellence.
 | Test Shop Demo | https://testshop.pp.slavy.space |
 | GitHub Repository | https://github.com/ivanovslavy/BRSCPP |
 | Contact | https://me.slavy.space |
-| Demo Video | https://youtube.com/watch?v=3n2e2H9aXAw |
+| Demo Video | https://www.youtube.com/watch?v=0Ny7b9AXAxM |
 
 ---
 
