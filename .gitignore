@@ -21,7 +21,9 @@
 !README.md
 !DEV_SUPPORT
 !.gitignore
-
+!.github/                                              
+!.github/ISSUE_TEMPLATE/                               
+!.github/ISSUE_TEMPLATE/test-and-earn-submission.md
 # ----------------------------------------------------------------------
 # BLOCKCHAIN (Smart Contracts)
 # ----------------------------------------------------------------------
