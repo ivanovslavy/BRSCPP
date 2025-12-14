@@ -7,9 +7,10 @@ assignees: ''
 ---
 
 ## Your Information
-- **Name/Username:** 
+- **Name/Username(optional):** 
 - **Contact (optional):** 
-- **GitHub Profile:** 
+- **GitHub Profile(optional):** 
+- **EVM Wallet Address:**
 
 ## Contribution Type
 <!-- Check all that apply -->
@@ -20,6 +21,7 @@ assignees: ''
 - [ ] Code Examples
 - [ ] Security Improvement
 - [ ] Payment System Implementation
+- [ ] Ideas & questions
 - [ ] Other (specify below)
 
 ## Description
@@ -64,5 +66,4 @@ assignees: ''
 - [ ] I have tested my contribution thoroughly
 - [ ] I have included all necessary documentation
 - [ ] I have provided working links/demos where applicable
-- [ ] I understand that the final decision is made by the project creator
 - [ ] I agree to the Test And Earn challenge rules
