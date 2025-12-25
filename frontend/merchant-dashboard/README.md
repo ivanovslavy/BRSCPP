@@ -2,9 +2,9 @@
 
 Merchant portal for payment management, analytics, and configuration.
 
-**Version:** 2.0  
-**Author:** Slavcho Ivanov  
-**Application URL:** https://merchant-dashboard.brscpp.slavy.space  
+**Version:** 2.0 
+**Author:** Slavcho Ivanov 
+**Application URL:** https://merchant-dashboard.brscpp.slavy.space 
 **Status:** In Progress (Core Features Complete - December 2025)
 
 ---
@@ -53,7 +53,7 @@ The Merchant Dashboard provides a web-based interface for merchants to manage th
 
 ## Current Features
 
-### Authentication System ✅
+### Authentication System 
 
 **Registration Methods:**
 - Email and password registration
@@ -67,7 +67,7 @@ The Merchant Dashboard provides a web-based interface for merchants to manage th
 - Secure session storage
 - Automatic token refresh
 
-### Dashboard Overview ✅
+### Dashboard Overview 
 
 **Statistics Display:**
 - Total revenue (USD)
@@ -81,7 +81,7 @@ The Merchant Dashboard provides a web-based interface for merchants to manage th
 - Access settings
 - Generate API key
 
-### Settings Page ✅
+### Settings Page 
 
 **Payment Method Configuration:**
 - Enable/disable cryptocurrency payments
@@ -101,7 +101,7 @@ The Merchant Dashboard provides a web-based interface for merchants to manage th
 - Revoke keys
 - Set key permissions
 
-### Transaction History (In Progress) 🚧
+### Transaction History (In Progress) 
 
 **Planned Features:**
 - Paginated transaction list
@@ -113,7 +113,7 @@ The Merchant Dashboard provides a web-based interface for merchants to manage th
 
 ## Planned Features
 
-### Analytics Dashboard 📊
+### Analytics Dashboard 
 
 **Revenue Analytics:**
 - Daily, weekly, monthly revenue charts
@@ -132,7 +132,7 @@ The Merchant Dashboard provides a web-based interface for merchants to manage th
 - Network preferences
 - Gas cost analysis
 
-### Advanced Settings ⚙️
+### Advanced Settings 
 
 **Payment Preferences:**
 - Custom fee discounts (for whitelisted merchants)
@@ -152,7 +152,7 @@ The Merchant Dashboard provides a web-based interface for merchants to manage th
 - IP whitelist
 - Rate limiting configuration
 
-### Reports 📄
+### Reports 
 
 **Financial Reports:**
 - Monthly revenue reports
@@ -186,25 +186,25 @@ The Merchant Dashboard provides a web-based interface for merchants to manage th
 merchant-dashboard/
 ├── src/
 │   ├── pages/
-│   │   ├── Login.jsx              ✅ Complete
-│   │   ├── Register.jsx           ✅ Complete
-│   │   ├── Dashboard.jsx          ✅ Complete
-│   │   ├── Settings.jsx           ✅ Complete
-│   │   ├── Transactions.jsx       🚧 In Progress
-│   │   ├── Analytics.jsx          📋 Planned
-│   │   └── APIKeys.jsx            📋 Planned
+│   │   ├── Login.jsx              
+│   │   ├── Register.jsx           
+│   │   ├── Dashboard.jsx          
+│   │   ├── Settings.jsx           
+│   │   ├── Transactions.jsx       
+│   │   ├── Analytics.jsx          
+│   │   └── APIKeys.jsx           
 │   ├── components/
-│   │   ├── Sidebar.jsx            ✅ Complete
-│   │   ├── Header.jsx             ✅ Complete
-│   │   ├── StatsCard.jsx          ✅ Complete
-│   │   ├── PaymentMethodToggle.jsx ✅ Complete
-│   │   └── WebhookConfig.jsx      🚧 In Progress
+│   │   ├── Sidebar.jsx            
+|   │   ├── Header.jsx             
+│   │   ├── StatsCard.jsx          
+│   │   ├── PaymentMethodToggle.jsx 
+│   │   └── WebhookConfig.jsx      
 │   ├── context/
-│   │   └── AuthContext.jsx        ✅ Complete
+│   │   └── AuthContext.jsx        
 │   ├── utils/
-│   │   └── api.js                 ✅ Complete
-│   ├── App.jsx                    ✅ Complete
-│   └── main.jsx                   ✅ Complete
+│   │   └── api.js                 
+│   ├── App.jsx                    
+│   └── main.jsx                   
 ├── public/
 ├── package.json
 ├── vite.config.js
@@ -305,7 +305,7 @@ function ProtectedRoute({ children }) {
 
 ## Dashboard Pages
 
-### Login Page ✅
+### Login Page 
 
 **Route:** `/login`
 
@@ -322,7 +322,7 @@ function ProtectedRoute({ children }) {
 - Password (required)
 - Remember me (checkbox)
 
-### Register Page ✅
+### Register Page
 
 **Route:** `/register`
 
@@ -340,7 +340,7 @@ function ProtectedRoute({ children }) {
 - Company Name (optional)
 - Terms acceptance (required)
 
-### Dashboard Overview ✅
+### Dashboard Overview 
 
 **Route:** `/dashboard`
 
@@ -378,7 +378,7 @@ function ProtectedRoute({ children }) {
 - "View All Transactions" button
 - "API Documentation" link
 
-### Settings Page ✅
+### Settings Page 
 
 **Route:** `/settings`
 
@@ -444,7 +444,7 @@ function ProtectedRoute({ children }) {
 </button>
 ```
 
-### Transactions Page 🚧
+### Transactions Page 
 
 **Route:** `/transactions`
 
@@ -702,7 +702,7 @@ sudo journalctl -u brscpp-v2-merchant-dashboard.service -f
 
 ## Development Status
 
-### Completed Features ✅
+### Completed Features
 
 - Authentication system (email + Web3)
 - Dashboard overview with statistics
@@ -714,7 +714,7 @@ sudo journalctl -u brscpp-v2-merchant-dashboard.service -f
 - Protected routes
 - Session management
 
-### In Progress 🚧
+### In Progress 
 
 - Transaction history page
 - Webhook testing interface
@@ -722,7 +722,7 @@ sudo journalctl -u brscpp-v2-merchant-dashboard.service -f
 - Transaction detail modal
 - CSV export functionality
 
-### Planned 📋
+### Planned 
 
 - Analytics dashboard
 - Revenue charts
@@ -799,8 +799,8 @@ MIT License
 
 ---
 
-**Last Updated:** December 22, 2025  
-**Document Version:** 2.0 (In Progress)  
+**Last Updated:** December 22, 2025
+**Document Version:** 2.0 (In Progress)
 **Author:** Slavcho Ivanov
 
 ---
