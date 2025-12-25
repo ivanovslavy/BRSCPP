@@ -1,0 +1,20 @@
+{
+  "network": "bscTestnet",
+  "chainId": 97,
+  "nativeToken": "BNB",
+  "deployedAt": "2025-12-08T13:29:32.204Z",
+  "deployer": "0x2786e48814C2E562A92aE53187b848DBB312d1a4",
+  "contracts": {
+    "gateway": "0x0E2878bC634Ac0c1C4d3dA22CFb171Fb67a2d6e7",
+    "usdc": "0x45787D76D24F3b47663eC3DEcc76f46C20Fa0c4C",
+    "usdt": "0xb6dFe9F6810955A3bcbdf7F99418C95Cb073F23D",
+    "faucet": "0x9959AD0fC939013aEca6121295272756E352d902"
+  },
+  "oracles": {
+    "native": "0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526",
+    "stable": "0x90c069C4538adAc136E051052E14c1cD799C41B7"
+  },
+  "explorer": "https://testnet.bscscan.com",
+  "feeCollector": "0x3A9Da2349caE432F46A04737d5F4c5EF9ef11973",
+  "feePercentage": "0.5%"
+}

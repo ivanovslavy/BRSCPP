@@ -1,0 +1,4 @@
+{
+  "filter_paths": "node_modules|contracts/MockERC20.sol|contracts/MockV3Aggregator.sol|contracts/TokenFaucet.sol|contracts/MaliciousAttacker.sol",
+  "exclude_dependencies": true
+}

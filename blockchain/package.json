@@ -21,6 +21,7 @@
   "dependencies": {
     "@chainlink/contracts": "^1.5.0",
     "@openzeppelin/contracts": "^5.4.0",
+    "@prb/math": "^4.1.0",
     "dotenv": "^17.2.3"
   }
 }

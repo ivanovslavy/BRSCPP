@@ -1,334 +1,615 @@
-# BRSCPP - Blockchain Real-time Settlement Crypto Payment Protocol
+# BRSCPP - Real-time No Custody Payment Infrastructure
 
-A non-custodial Web3 payment infrastructure for instant cryptocurrency settlements without KYC. Direct wallet-to-wallet settlement system with price-locked quotes using Chainlink Oracles.
+**Version:** 2.1  
+**Author:** Slavcho Ivanov  
+**License:** MIT  
+**Status:** Production Beta (December 2025)
 
-**Current Status:** Live Beta Testing (December 2025)
-
-**Networks:** Sepolia Testnet, BSC Testnet
-
-**Tokens:** ETH, BNB, USDC, USDT
-
-**Website:** https://pp.slavy.space
-
-**Demo Shop:** https://testshop.pp.slavy.space
+**Web Page:** https://brscpp.slavy.space
 
 ---
 
-## Quick Links
+## Table of Contents
 
-- [Smart Contracts Documentation](blockchain/README.md)
-- [Backend API Documentation](backend/brscpp_backend/README.md)
-- [Test Shop Backend Documentation](backend/testshop_backend/README.md)
-- [Marketing Site Documentation](frontend/marketing_app/README.md)
-- [Payment App Documentation](frontend/payment_app/README.md)
-- [Test Shop Frontend Documentation](frontend/testshop_app/README.md)
+1. [Overview](#overview)
+2. [System Architecture](#system-architecture)
+3. [Key Features](#key-features)
+4. [Technology Stack](#technology-stack)
+5. [Network Deployment Status](#network-deployment-status)
+6. [Supported Payment Methods](#supported-payment-methods)
+7. [Merchant Dashboard](#merchant-dashboard)
+8. [Project Structure](#project-structure)
+9. [Payment Flow](#payment-flow)
+10. [Testing Resources](#testing-resources)
+11. [Development Roadmap](#development-roadmap)
+12. [Security](#security)
+13. [Performance Metrics](#performance-metrics)
+14. [System Requirements](#system-requirements)
+15. [Contributing](#contributing)
+16. [Career Opportunities](#career-opportunities)
+17. [Links and Resources](#links-and-resources)
+18. [License](#license)
 
 ---
 
 ## Overview
 
-BRSCPP enables merchants to accept cryptocurrency payments in their web stores. Customers pay in crypto (ETH, BNB, USDC, USDT) while merchants set prices in 12 supported fiat currencies with automatic USD conversion for blockchain operations.
+BRSCPP is a non-custodial Web3 payment infrastructure enabling merchants to accept both cryptocurrency and fiat payments through a unified API. The system eliminates intermediaries through direct peer-to-peer settlement while providing merchants with traditional payment processor integration via Stripe and PayPal.
 
-### Key Features
+**Core Innovation:** Version 2.1 achieves 310% cost reduction compared to v1 by eliminating quote-locking transactions for stablecoin payments. Merchants can now accept direct USDC/USDT transfers with significantly lower gas costs.
 
-- **Non-Custodial:** P2P transfers, no intermediaries, no custody
-- **Multi-Currency:** 12 fiat currencies supported (USD, EUR, GBP, JPY, CNY, RUB, INR, CAD, AUD, BRL, MXN, KRW)
-- **Multi-Chain:** Sepolia (Ethereum), BSC Testnet, Polygon Amoy (deployed)
-- **Multi-Token:** Native tokens (ETH, BNB) and stablecoins (USDC, USDT)
-- **Price Protection:** Chainlink oracle-locked quotes (60-120 seconds)
-- **Instant Settlement:** Immediate fund transfer to merchant wallet
-- **Low Fees:** 1% on Sepolia, 0.5% on BSC Testnet (on-chain deduction)
-- **Open Source:** Verified smart contracts, publicly auditable
+### Primary Use Cases
+
+- E-commerce cryptocurrency payment processing
+- Cross-border merchant settlements
+- Decentralized marketplace integrations
+- Fiat-to-crypto payment gateway services
+- Multi-method checkout (Crypto + Stripe + PayPal)
+
+### Production Endpoints
+
+| Service | URL | Purpose |
+|---------|-----|---------|
+| API Server | https://api.brscpp.slavy.space | Payment processing backend |
+| Payment Application | https://payment.brscpp.slavy.space | Checkout interface |
+| Merchant Dashboard | https://merchant-dashboard.brscpp.slavy.space | Merchant portal |
+| Marketing Site | https://brscpp.slavy.space | Documentation and registration |
+| Demo Shop | https://testshop-frontend.brscpp.slavy.space | Integration example |
 
 ---
 
-## Architecture
+## System Architecture
 ```
+┌──────────────────────────────────────────────────────────────────┐
+│                         Merchant Layer                           │
+│  ┌────────────────┐         ┌──────────────────┐               │
+│  │  Web Store     │────────►│  BRSCPP API      │               │
+│  │  (Customer)    │  API    │  (Node.js)       │               │
+│  └────────────────┘  Call   └────────┬─────────┘               │
+└──────────────────────────────────────│──────────────────────────┘
+                                        │
+         ┌──────────────────────────────┼──────────────────────────┐
+         │                              │                          │
+         ▼                              ▼                          ▼
+┌─────────────────┐          ┌─────────────────┐         ┌─────────────────┐
+│  PostgreSQL DB  │          │  Payment App    │         │  Fiat Payments  │
+│  (Prisma ORM)   │          │  (React)        │         │  Stripe/PayPal  │
+└─────────────────┘          └────────┬────────┘         └─────────────────┘
+                                       │
+         ┌─────────────────────────────┼─────────────────────────────┐
+         │                             │                             │
+         ▼                             ▼                             ▼
+┌─────────────────┐          ┌─────────────────┐          ┌─────────────────┐
+│  Smart Contract │          │   Chainlink     │          │  NFT Gift       │
+│  (Multi-chain)  │          │   Oracles       │          │  Contract       │
+└────────┬────────┘          └─────────────────┘          └─────────────────┘
+         │
+         ▼
 ┌─────────────────┐
-│   Merchant      │
-│   Web Store     │
-└────────┬────────┘
-         │ API Request
-         ▼
-┌─────────────────┐      ┌──────────────┐
-│  BRSCPP API     │─────►│  PostgreSQL  │
-│  (Node.js)      │      │   Database   │
-└────────┬────────┘      └──────────────┘
-         │ Payment URL
-         ▼
-┌─────────────────┐
-│  Payment App    │
-│  (React)        │
-└────────┬────────┘
-         │ Web3 Transaction
-         ▼
-┌─────────────────┐      ┌──────────────┐
-│  Smart Contract │◄─────│  Chainlink   │
-│  (Solidity)     │      │   Oracles    │
-└────────┬────────┘      └──────────────┘
-         │ P2P Transfer
-         ▼
-┌─────────────────┐
-│   Customer      │
-│   Wallet        │
+│  Customer Wallet│
+│  (MetaMask)     │
 └─────────────────┘
 ```
 
-### Technology Stack
-
-**Blockchain Layer:**
-- Solidity smart contracts
-- Chainlink Price Feeds (dual-oracle validation)
-- OpenZeppelin libraries (ReentrancyGuard, Ownable)
+### Component Description
 
 **Backend Layer:**
-- Node.js with Express.js
-- PostgreSQL database
-- Prisma ORM
-- RESTful API
+- RESTful API server handling payment requests and merchant authentication
+- PostgreSQL database with Prisma ORM for payment records and merchant data
+- JWT and API key-based dual authentication system
+- Real-time webhook delivery to merchant endpoints
+- Event listener with polling mode for blockchain events
+
+**Blockchain Layer:**
+- CryptoPaymentGateway smart contract (Solidity 0.8.27)
+- Chainlink price feed integration for ETH/USD, BNB/USD, MATIC/USD oracle data
+- Direct stablecoin transfer mechanism (USDC/USDT)
+- NFT reward contract with signature-based minting
 
 **Frontend Layer:**
-- React with Vite
-- TailwindCSS
-- ethers.js v6
-- MetaMask integration
+- React-based payment checkout application
+- Merchant dashboard for transaction monitoring and settings
+- MetaMask integration with multi-chain network switching
+- Real-time payment status updates via WebSocket
+
+**Payment Processor Integration:**
+- Stripe Connect for credit card processing
+- PayPal Commerce Platform for PayPal payments
+- Automatic currency conversion (12 fiat currencies to USD)
+- Unified webhook system for crypto and fiat payments
+
+---
+
+## Key Features
+
+### Version 2.1 New Features (December 2025)
+
+**Merchant Dashboard:**
+- Complete merchant portal with real-time analytics
+- Revenue breakdown by payment provider (Crypto/Stripe/PayPal)
+- Transaction management with filters and CSV export
+- API key management (create, view, revoke)
+- Profile management with wallet linking
+
+**Multi-Method Authentication:**
+- Email/password registration and login
+- Web3 wallet authentication (MetaMask)
+- Wallet linking to existing accounts
+- Dual auth support (email + web3)
+
+**Payment Provider Integration:**
+- Stripe Connect onboarding flow
+- PayPal Commerce Platform integration
+- Per-merchant payment method configuration
+- Real-time connection status display
+
+**Event Listener Improvements:**
+- Polling mode for reliable event capture
+- Multi-network support (Sepolia, BSC, Polygon)
+- Automatic recovery from RPC errors
+- Configurable poll intervals per network
+
+### Version 2.0 Features
+
+**Cost Optimization:**
+- Direct stablecoin transfers bypass quote-locking mechanism
+- 310% reduction in transaction costs for USDC/USDT payments
+- Single-transaction settlement for stablecoins
+
+**Dual Payment System:**
+- Cryptocurrency payments via smart contracts
+- Credit card payments via Stripe integration
+- PayPal payments via Commerce Platform
+- Unified merchant API for all payment methods
+
+**Merchant Customization:**
+- Configurable fee structures (0% to 100% discount capability)
+- Early adopter and special merchant whitelist support
+- Real-time payment method configuration via dashboard
+
+**Enhanced Integration:**
+- NFT gift rewards for all payment types
+- Multi-currency support (12 fiat currencies)
+- Automatic exchange rate conversion via Chainlink and external APIs
+
+### Core Features
+
+**Non-Custodial Architecture:**
+- Direct peer-to-peer fund transfers
+- No intermediate custody or escrow
+- Merchant receives funds immediately to specified wallet
+
+**Multi-Chain Support:**
+- Ethereum Sepolia Testnet
+- Binance Smart Chain Testnet
+- Polygon Amoy Testnet
+
+**Multi-Token Support:**
+- Native tokens: ETH, BNB, MATIC
+- Stablecoins: USDC, USDT (direct transfer capability)
+
+**Price Oracle Integration:**
+- Chainlink price feeds for native token valuations
+- Dual-oracle validation with configurable deviation thresholds
+- Staleness protection (1-hour maximum for testnet deployments)
+
+**Security Features:**
+- Reentrancy protection (OpenZeppelin ReentrancyGuard)
+- Access control (Ownable pattern)
+- Emergency pause functionality
+- Quote expiration enforcement
+- Merchant whitelist system
+
+---
+
+## Technology Stack
+
+### Blockchain
+
+| Component | Technology | Version |
+|-----------|-----------|---------|
+| Smart Contracts | Solidity | 0.8.27 |
+| Development Framework | Hardhat | Latest |
+| Security Libraries | OpenZeppelin | 5.x |
+| Price Oracles | Chainlink | Latest |
+| Web3 Library | ethers.js | 6.x |
+
+### Backend
+
+| Component | Technology | Version |
+|-----------|-----------|---------|
+| Runtime | Node.js | 20.x |
+| Framework | Express.js | 4.x |
+| Database | PostgreSQL | 15.x |
+| ORM | Prisma | 5.x |
+| Authentication | JWT + API Keys | - |
+| Payment Processors | Stripe, PayPal | Latest |
+| WebSocket | Socket.IO | 4.x |
+
+### Frontend
+
+| Component | Technology | Version |
+|-----------|-----------|---------|
+| Framework | React | 18.x |
+| Build Tool | Vite | 5.x |
+| Styling | TailwindCSS | 3.x |
+| Routing | React Router | 6.x |
+| Web3 Integration | ethers.js | 6.x |
+
+---
+
+## Network Deployment Status
+
+### Smart Contracts
+
+#### Sepolia Testnet
+
+| Contract | Address | Fee | Status |
+|----------|---------|-----|--------|
+| CryptoPaymentGateway | `0x31b80790726c88f342447DA710fa814d41B141Dd` | 0.5% | Active |
+| NFT Gift Contract | `0x3699fcA271bE686f8501aDba0f24dDa4358ebbAA` | - | Active |
+| USDC Token | `0xC4De068C028127bdB44670Edb82e6E3Ff4113E49` | - | Active |
+| USDT Token | `0x00D75E583DF2998C7582842e69208ad90820Eaa1` | - | Active |
+
+**Chainlink Oracle:** ETH/USD: `0x694AA1769357215DE4FAC081bf1f309aDC325306`
+
+#### BSC Testnet
+
+| Contract | Address | Fee | Status |
+|----------|---------|-----|--------|
+| CryptoPaymentGateway | `0xee6162f759A647351aB71c7296Fd02bDe7534074` | 0.5% | Active |
+| NFT Gift Contract | `0xF166733eD46F7A7185A31eC6E0D6b74C06c57ff8` | - | Active |
+| USDC Token | `0x45787D76D24F3b47663eC3DEcc76f46C20Fa0c4C` | - | Active |
+| USDT Token | `0xb6dFe9F6810955A3bcbdf7F99418C95Cb073F23D` | - | Active |
+
+**Chainlink Oracle:** BNB/USD: `0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526`
+
+#### Polygon Amoy Testnet
+
+| Contract | Address | Fee | Status |
+|----------|---------|-----|--------|
+| CryptoPaymentGateway | `0xC4De068C028127bdB44670Edb82e6E3Ff4113E49` | 0.5% | Active |
+| NFT Gift Contract | `0xD24a89dc1686C2F88d33A70250473495459C564a` | - | Active |
+| USDC Token | `0x3F6357a74Bec93F6281aA1FC705133eC71a1BaE2` | - | Active |
+| USDT Token | `0x9f9eF1DA8A630917383B0b78104887Da1D48dA01` | - | Active |
+
+**Chainlink Oracle:** MATIC/USD: `0x001382149eBa3441043c1c66972b4772963f5D43`
+
+### Backend Services
+
+| Service | Port | Status | Description |
+|---------|------|--------|-------------|
+| Payment API | 3062 | Active | Main API server |
+| Event Listener | - | Active | Blockchain event polling |
+| TestShop Backend | 3064 | Active | Demo shop API |
+
+### Frontend Applications
+
+| Application | URL | Status |
+|------------|-----|--------|
+| Payment App | payment.brscpp.slavy.space | Active |
+| Merchant Dashboard | merchant-dashboard.brscpp.slavy.space | Active |
+| Marketing Site | brscpp.slavy.space | Active |
+| TestShop Frontend | testshop-frontend.brscpp.slavy.space | Active |
+
+---
+
+## Supported Payment Methods
+
+### Cryptocurrency Payments
+
+**Networks:**
+- Ethereum (Sepolia Testnet)
+- Binance Smart Chain (Testnet)
+- Polygon (Amoy Testnet)
+
+**Tokens:**
+- ETH (Ethereum native)
+- BNB (BSC native)
+- MATIC (Polygon native)
+- USDC (stablecoin - all networks)
+- USDT (stablecoin - all networks)
+
+### Fiat Payments
+
+**Stripe:**
+- Credit/Debit card payments
+- Stripe Connect for merchant payouts
+- Automatic onboarding flow
+
+**PayPal:**
+- PayPal Commerce Platform integration
+- PayPal account payments
+- Merchant onboarding via Partner Referrals
+
+**Supported Currencies:**
+USD, EUR, GBP, JPY, CNY, RUB, INR, CAD, AUD, BRL, MXN, KRW
+
+**Currency Conversion:**
+All fiat currencies automatically convert to USD for blockchain operations using real-time exchange rates.
+
+---
+
+## Merchant Dashboard
+
+### Features
+
+**Dashboard Overview:**
+- All-time revenue statistics
+- Last 30 days performance
+- Revenue breakdown by payment provider
+- Transaction count and success rate
+- Quick action links
+
+**Transactions:**
+- Full transaction history
+- Filter by date, payment method, network, status
+- Search by order ID, transaction hash
+- CSV export functionality
+- Correct blockchain explorer links per network
+
+**Payment Settings:**
+- Enable/disable payment methods (Crypto, Stripe, PayPal)
+- Network configuration (Sepolia, BSC, Amoy)
+- Token selection per network
+- Stripe Connect onboarding
+- PayPal Commerce Platform onboarding
+- Webhook URL and secret configuration
+
+**API Keys:**
+- Create new API keys (test/live environment)
+- View existing keys with prefix
+- Revoke keys
+- Copy to clipboard functionality
+- Security: full key shown only once on creation
+
+**Profile:**
+- Account information (email, company name, website)
+- Wallet connection/linking
+- Support for both email and Web3 authentication
+- Account overview with connection status
+
+### Authentication Methods
+
+**Email Authentication:**
+- Registration with email, password, company name
+- Login with email and password
+- Password hashing with bcrypt
+
+**Web3 Authentication:**
+- MetaMask wallet connection
+- Signature-based authentication (SIWE)
+- Wallet linking to existing accounts
+- Dual auth mode support
 
 ---
 
 ## Project Structure
 ```
 brscpp/
-├── blockchain/              Smart contracts and deployment scripts
-│   ├── contracts/          Gateway and faucet contracts (Solidity)
-│   ├── scripts/            Deployment and testing scripts
-│   ├── deployments/        Deployment addresses
-│   └── README.md           Full blockchain documentation
-│
-├── backend/
-│   ├── brscpp_backend/     Payment gateway API
-│   │   ├── src/            API source code
-│   │   ├── prisma/         Database schema
-│   │   └── README.md       API documentation
+├── pp-v2/                       # Version 2 implementation
+│   ├── blockchain/              # Smart contract layer
+│   │   ├── contracts/           # Solidity source files
+│   │   ├── scripts/             # Deployment scripts
+│   │   └── deployed/            # Deployment records
 │   │
-│   └── testshop_backend/   Demo shop backend
-│       ├── src/            Shop API source
-│       └── README.md       Shop backend documentation
+│   ├── backend/                 # API server layer
+│   │   ├── src/
+│   │   │   ├── routes/          # API endpoints
+│   │   │   ├── services/        # Business logic
+│   │   │   ├── middleware/      # Auth middleware
+│   │   │   ├── workers/         # Event listener
+│   │   │   └── config/          # Configuration
+│   │   └── prisma/              # Database schema
+│   │
+│   ├── frontend/
+│   │   ├── payment-page/        # Checkout application
+│   │   ├── merchant-dashboard/  # Merchant portal
+│   │   └── marketing-app/       # Landing page
+│   │
+│   └── testshop/                # Demo shop
+│       ├── frontend/            # Shop UI
+│       └── backend/             # Shop API with WebSocket
 │
-└── frontend/
-    ├── marketing_app/      Landing page (pp.slavy.space)
-    │   ├── src/            Marketing site source
-    │   └── README.md       Marketing site documentation
-    │
-    ├── payment_app/        Checkout application (app.pp.slavy.space)
-    │   ├── src/            Payment app source
-    │   └── README.md       Payment app documentation
-    │
-    └── testshop_app/       Demo shop (testshop.pp.slavy.space)
-        ├── src/            Shop frontend source
-        └── README.md       Shop frontend documentation
+└── README.md                    # This file
 ```
-
----
-
-## Deployment Status
-
-### Smart Contracts
-
-| Network | Gateway Address | Faucet Address | Fee | Status |
-|---------|----------------|----------------|-----|--------|
-| Sepolia | `0x1378329ABE689594355a95bDAbEaBF015ef9CF39` | `0xFB370f6c9Bd1dbc7dB6c202D5B9e6B8F30273c00` | 1% | Live |
-| BSC Testnet | `0x0E2878bC634Ac0c1C4d3dA22CFb171Fb67a2d6e7` | `0x9959AD0fC939013aEca6121295272756E352d902` | 0.5% | Live |
-| Polygon Amoy | `0x6d125b85f49066f7BEaB3ffEa412b6B54948E539` | `0x0E2878bC634Ac0c1C4d3dA22CFb171Fb67a2d6e7` | 1% | Deployed |
-
-### Backend Services
-
-| Service | URL | Status |
-|---------|-----|--------|
-| Payment API | https://api.pp.slavy.space | Live |
-| Test Shop API | https://backend.testshop.pp.slavy.space | Live |
-
-### Frontend Applications
-
-| Application | URL | Status |
-|------------|-----|--------|
-| Marketing Site | https://pp.slavy.space | Live |
-| Payment App | https://app.pp.slavy.space | Live |
-| Test Shop | https://testshop.pp.slavy.space | Live |
 
 ---
 
 ## Payment Flow
 
-### Merchant Integration
-1. Register at https://pp.slavy.space/register
-2. Receive API key
-3. Create payment request via API with order ID, amount, currency, network
-4. Redirect customer to payment URL
-5. Receive funds directly to wallet (P2P)
+### Cryptocurrency Payment Flow
+```
+1. Merchant creates payment request via API
+2. Backend converts fiat currency to USD (if applicable)
+3. Customer redirected to payment application
+4. Customer selects blockchain network and token
+5. System queries Chainlink oracle for current token price
+6. Payment execution:
+   - Native Tokens: Quote lock → Payment confirmation
+   - Stablecoins: Direct transfer (310% cheaper)
+7. Event listener detects blockchain event
+8. Payment recorded in database
+9. Webhook notification sent to merchant
+10. NFT gift available for customer claim
+```
 
-### Customer Experience
-1. Select blockchain network (Sepolia or BSC Testnet)
-2. Choose token (Native or Stablecoin)
-3. Lock price quote (60-120 second timer)
-4. Approve token spending (stablecoins only)
-5. Confirm payment transaction
-6. Payment complete, merchant receives funds instantly
+### Stripe Payment Flow
+```
+1. Merchant creates payment request via API
+2. Customer selects Stripe payment option
+3. Redirect to Stripe Checkout session
+4. Stripe processes credit card payment
+5. Stripe webhook received and verified
+6. Payment recorded in database
+7. Webhook notification sent to merchant
+8. NFT gift available (requires wallet connection)
+```
 
----
-
-## Supported Currencies
-
-### Fiat Currencies (Merchant Side)
-USD, EUR, GBP, JPY, CNY, RUB, INR, CAD, AUD, BRL, MXN, KRW
-
-All currencies automatically convert to USD for blockchain operations.
-
-### Crypto Tokens (Customer Side)
-
-**Sepolia Testnet:**
-- ETH (native)
-- USDC (0xC4De068C028127bdB44670Edb82e6E3Ff4113E49)
-- USDT (0x00D75E583DF2998C7582842e69208ad90820Eaa1)
-
-**BSC Testnet:**
-- BNB (native)
-- USDC (0x45787D76D24F3b47663eC3DEcc76f46C20Fa0c4C)
-- USDT (0xb6dFe9F6810955A3bcbdf7F99418C95Cb073F23D)
+### PayPal Payment Flow
+```
+1. Merchant creates payment request via API
+2. Customer selects PayPal payment option
+3. Redirect to PayPal checkout
+4. Customer approves payment in PayPal
+5. PayPal webhook received and verified
+6. Payment recorded in database
+7. Webhook notification sent to merchant
+8. NFT gift available (requires wallet connection)
+```
 
 ---
 
 ## Testing Resources
 
-### Test Token Faucets
-Access free test tokens at https://pp.slavy.space/faucets
+### Test Networks
 
-**Available Tokens:**
-- USDC: 10,000 per claim (24-hour cooldown)
-- USDT: 10,000 per claim (24-hour cooldown)
+**Sepolia Testnet:**
+- Network ID: 11155111
+- Explorer: https://sepolia.etherscan.io
+- Faucet: https://sepoliafaucet.com
 
-**Supported Networks:**
-- Sepolia Testnet
-- BSC Testnet
+**BSC Testnet:**
+- Network ID: 97
+- Explorer: https://testnet.bscscan.com
+- Faucet: https://testnet.bnbchain.org/faucet-smart
+
+**Polygon Amoy:**
+- Network ID: 80002
+- Explorer: https://amoy.polygonscan.com
+
+### BRSCPP Token Faucets
+
+Access test USDC and USDT at: https://brscpp.slavy.space/faucets
+
+- USDC: 10,000 per claim
+- USDT: 10,000 per claim
+- Cooldown: 24 hours per address
 
 ### Demo Shop
-Experience complete payment flow at https://testshop.pp.slavy.space
+
+Complete integration demonstration: https://testshop-frontend.brscpp.slavy.space
 
 **Features:**
-- Multi-currency product pricing
-- Network selection (Sepolia/BSC)
-- Token selection (Native/USDC/USDT)
-- Complete checkout flow
-
----
-
-## API Integration Example
-```javascript
-const axios = require('axios');
-
-const response = await axios.post(
-  'https://api.pp.slavy.space/api/merchant/payment-request',
-  {
-    orderId: 'ORDER-123',
-    amountUsd: '100.00',
-    currency: 'USD',
-    network: 'sepolia',
-    description: 'Product purchase'
-  },
-  {
-    headers: {
-      'Authorization': 'Bearer YOUR_API_KEY',
-      'Content-Type': 'application/json'
-    }
-  }
-);
-
-const paymentUrl = response.data.paymentRequest.paymentUrl;
-// Redirect customer to: paymentUrl
-```
-
-Full API documentation: https://pp.slavy.space/docs
+- Multi-currency product pricing (12 currencies)
+- Network and token selection
+- Crypto, Stripe, and PayPal checkout
+- Real-time WebSocket payment confirmation
+- NFT gift claiming
 
 ---
 
 ## Development Roadmap
 
-| Period | Status | Milestone |
-|--------|--------|-----------|
-| Q1-Q2 2025 | Complete | Smart contract development and testing |
-| Q3 2025 | Complete | Backend API development |
-| Q3-Q4 2025 | Complete | Frontend applications development |
-| Q4 2025 | In Progress | Multi-chain deployment, testing, documentation |
-| Q1-Q2 2026 | Planned | WordPress plugin, JavaScript widget, beta testing |
-| Q3-Q4 2026 | Planned | Mainnet launch (Ethereum, Polygon, BSC) |
+### 2026 Roadmap
+
+**Q1 2026:**
+- WooCommerce plugin release
+- WordPress widget development
+- Extended documentation
+
+**Q2 2026:**
+- Marketing campaign launch
+- Community building (LinkedIn, X, Discord)
+- Video advertisements
+
+**Q3 2026:**
+- Professional smart contract audit
+- Mainnet preparation
+- Production server deployment
+
+**Q4 2026:**
+- Company establishment
+- MiCA L1 license acquisition
+- Mainnet launch (Ethereum, BSC, Polygon)
 
 ---
 
 ## Security
 
-### Smart Contract Security Features
-- Reentrancy protection
-- Access control (Ownable)
-- Dual-oracle price validation
-- Oracle staleness protection
-- Quote expiration enforcement
-- Merchant whitelist system
-- Emergency pause functionality
+### Smart Contract Security
 
-### Security Audit
-Professional security audit planned for Q1 2026 before mainnet launch.
+- Reentrancy guard (OpenZeppelin)
+- Access control (Ownable)
+- Emergency pause functionality
+- Oracle staleness validation
+- Quote expiration enforcement
+
+### Backend Security
+
+- JWT tokens with 30-day expiration
+- API key authentication
+- Password hashing (bcrypt)
+- HTTPS/TLS encryption
+- Rate limiting
+- SQL injection prevention (Prisma)
+- CORS policy enforcement
 
 ### Reporting Vulnerabilities
-Report security issues via https://me.slavy.space (contact form)
-
-Do not create public GitHub issues for security concerns.
-
----
-
-## System Requirements
-
-**Tested Configuration:**
-- OS: Ubuntu Desktop
-- Browser: Firefox (latest version)
-- Wallet: MetaMask extension
-
-**Note:** Compatibility with other operating systems, browsers, and wallet providers has not been extensively tested.
-
----
-
-## Contributing
-
-BRSCPP is currently in beta testing phase. We welcome:
-- Bug reports
-- Feature suggestions
-- Integration feedback
-- Documentation improvements
 
 Contact: https://me.slavy.space
 
 ---
 
-## Job Openings
+## Performance Metrics
 
-### Marketing Specialist
-Develop go-to-market strategy and build community around BRSCPP protocol.
+### Transaction Costs (Testnet)
 
-**Responsibilities:**
-- Social media management and content development
-- Developer outreach programs
-- Partnership development and community engagement
+| Payment Method | Gas Cost | USD Equivalent |
+|---------------|----------|----------------|
+| ETH Payment (Quote) | ~150,000 gas | ~$0.50 |
+| USDC Direct Transfer | ~65,000 gas | ~$0.15 |
+| Stripe Payment | $0.30 + 2.9% | Variable |
+| PayPal Payment | 2.9% + $0.30 | Variable |
 
-**Compensation:** Payable or co-owner agreements available
+### Processing Times
 
-### React Developer
-Enhance frontend applications with focus on UI/UX excellence.
+| Step | Duration |
+|------|----------|
+| Payment Request Creation | <100ms |
+| Quote Generation | <500ms |
+| Blockchain Confirmation | 12-15s |
+| Webhook Delivery | <1s |
 
-**Responsibilities:**
-- Design and develop user-friendly interfaces
-- Optimize frontend performance
+---
 
-**Compensation:** Payable or co-owner agreements available
+## System Requirements
 
-**Apply:** https://me.slavy.space
+### Development Environment
+
+- Node.js 20.x or higher
+- PostgreSQL 15.x or higher
+- 8GB RAM recommended
+- 50GB SSD storage
+
+### Client Requirements
+
+- Modern browser (Chrome, Firefox, Safari)
+- MetaMask browser extension (for crypto payments)
+
+---
+
+## Contributing
+
+Contributions welcome:
+- Bug fixes and security improvements
+- Performance optimizations
+- Documentation improvements
+- Integration testing
+
+Contact: https://me.slavy.space
+
+---
+
+## Career Opportunities
+
+**Open Positions:**
+- Marketing Specialist
+- React Developer / UI Designer
+
+Compensation: Negotiable salary or co-ownership
+
+Apply: https://me.slavy.space
 
 ---
 
@@ -336,31 +617,22 @@ Enhance frontend applications with focus on UI/UX excellence.
 
 | Resource | URL |
 |----------|-----|
-| Website | https://pp.slavy.space |
-| Documentation | https://pp.slavy.space/docs |
-| Integration Guide | https://pp.slavy.space/integration |
-| Token Faucets | https://pp.slavy.space/faucets |
-| Test Shop Demo | https://testshop.pp.slavy.space |
+| Main Website | https://brscpp.slavy.space |
+| API Documentation | https://brscpp.slavy.space/docs |
+| Demo Shop | https://testshop-frontend.brscpp.slavy.space |
+| Merchant Dashboard | https://merchant-dashboard.brscpp.slavy.space |
 | GitHub Repository | https://github.com/ivanovslavy/BRSCPP |
-| Contact | https://me.slavy.space |
-| Demo Video | https://www.youtube.com/watch?v=0Ny7b9AXAxM |
 
 ---
 
 ## License
 
-MIT License - See LICENSE file for details
+MIT License
+
+Copyright (c) 2025 Slavcho Ivanov
 
 ---
 
-## Acknowledgments
-
-Built with support from:
-- Chainlink (Price feed oracles)
-- OpenZeppelin (Smart contract libraries)
-- Ethereum Foundation (Sepolia testnet)
-- Binance (BSC testnet infrastructure)
-
----
-
-Last Updated: December 2025
+**Last Updated:** December 24, 2025  
+**Document Version:** 2.1  
+**Author:** Slavcho Ivanov

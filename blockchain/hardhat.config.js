@@ -1,6 +1,31 @@
-// hardhat.config.js
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
+
+const getRpcUrl = (networkName) => {
+  const envKey = networkName.toUpperCase() + "_RPC_URL";
+  const customRpc = process.env[envKey];
+  if (customRpc && customRpc.trim() !== "") {
+    return customRpc;
+  }
+  const fallbacks = {
+    sepolia: "https://ethereum-sepolia-rpc.publicnode.com",
+    mainnet: "https://eth.llamarpc.com",
+    polygon: "https://polygon-rpc.com",
+    amoy: "https://rpc-amoy.polygon.technology",
+    bsc: "https://binance.llamarpc.com",
+    bscTestnet: "https://data-seed-prebsc-1-s1.binance.org:8545/"
+  };
+  return fallbacks[networkName] || "";
+};
+
+const accounts = [
+  process.env.PRIVATE_KEY_OWNER,
+  process.env.PRIVATE_KEY_CUSTOMER,
+  process.env.PRIVATE_KEY_MERCHANT,
+  process.env.PRIVATE_KEY_VIP
+].filter(Boolean);
+
+console.log("--- Network Config Initialized ---");
 
 module.exports = {
   solidity: {
@@ -17,49 +42,29 @@ module.exports = {
     hardhat: {
       chainId: 31337
     },
-    localhost: {
-      url: "http://127.0.0.1:8545",
-      chainId: 31337
-    },
     sepolia: {
-  url: `https://sepolia.infura.io/v3/${process.env.INFURA_API_KEY}`,
-  accounts: [
-    process.env.PRIVATE_KEY,
-    ...(process.env.CUSTOMER_PRIVATE_KEY ? [process.env.CUSTOMER_PRIVATE_KEY] : []),
-    ...(process.env.HACKER_PRIVATE_KEY ? [process.env.HACKER_PRIVATE_KEY] : [])
-  ],
-  chainId: 11155111
-},
-    mainnet: {
-      url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 1
-    },
-    bsc: {
-      url: "https://bsc-dataseed.binance.org/",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 56
+      url: getRpcUrl("sepolia"),
+      accounts,
+      chainId: 11155111
     },
     bscTestnet: {
       url: "https://data-seed-prebsc-1-s1.binance.org:8545/",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      accounts,
       chainId: 97
     },
-    polygon: {
-      url: `https://polygon-mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 137
-    },
     amoy: {
-      url: `https://polygon-amoy.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      url: getRpcUrl("amoy"),
+      accounts,
       chainId: 80002
     }
   },
+  
+  // ETHERSCAN V2 - ЕДИН КЛЮЧ ЗА ВСИЧКИ
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY
   },
+  
   sourcify: {
-    enabled: false
+    enabled: true
   }
 };

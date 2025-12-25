@@ -1,0 +1,27 @@
+{
+  "network": "amoy",
+  "chainId": 80002,
+  "nativeToken": "MATIC",
+  "isTestnet": true,
+  "deployedAt": "2025-12-22T19:23:03.817Z",
+  "deployer": "0x2786e48814C2E562A92aE53187b848DBB312d1a4",
+  "contracts": {
+    "usdc": "0x3F6357a74Bec93F6281aA1FC705133eC71a1BaE2",
+    "usdt": "0x9f9eF1DA8A630917383B0b78104887Da1D48dA01",
+    "gateway": "0xdAC83fe6F2494C5Eb0EBfd015089E60818911806"
+  },
+  "oracles": {
+    "native": "0x001382149eBa3441043c1c66972b4772963f5D43",
+    "stable": "0x1b8739bB4CdF0089d07097A9Ae5Bd274b29C6F16"
+  },
+  "config": {
+    "owner": "0x2786e48814C2E562A92aE53187b848DBB312d1a4",
+    "feeCollector": "0x45c56da734b9bf124ca4447dbfaafe6cf6e29c53",
+    "feePercentage": 50,
+    "quoteValidityBlocks": 500,
+    "oracleStalenessSeconds": 86400
+  },
+  "explorer": "https://amoy.polygonscan.com",
+  "configurationError": "INTERNAL_ERROR: insufficient funds",
+  "verified": true
+}
