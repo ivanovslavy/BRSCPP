@@ -3,23 +3,24 @@
   "chainId": 11155111,
   "nativeToken": "ETH",
   "isTestnet": true,
-  "deployedAt": "2025-12-22T19:12:21.591Z",
-  "deployer": "0x2786e48814C2E562A92aE53187b848DBB312d1a4",
+  "deployedAt": "2026-01-05T14:20:46.251Z",
+  "deployer": "0x8eB8Bf106EbC9834a2586D04F73866C7436Ce298",
   "contracts": {
     "usdc": "0xC4De068C028127bdB44670Edb82e6E3Ff4113E49",
     "usdt": "0x00D75E583DF2998C7582842e69208ad90820Eaa1",
-    "gateway": "0x31b80790726c88f342447DA710fa814d41B141Dd"
+    "gateway": "0x500eD72B32088FE23D39fb28c575330da8457591"
   },
   "oracles": {
     "native": "0x694AA1769357215DE4FAC081bf1f309aDC325306",
     "stable": "0xA2F78ab2355fe2f984D808B5CeE7FD0A93D5270E"
   },
   "config": {
-    "owner": "0x2786e48814C2E562A92aE53187b848DBB312d1a4",
+    "owner": "0x8eb8bf106ebc9834a2586d04f73866c7436ce298",
     "feeCollector": "0x45c56da734b9bf124ca4447dbfaafe6cf6e29c53",
     "feePercentage": 50,
     "quoteValidityBlocks": 100,
-    "oracleStalenessSeconds": 86400
+    "oracleStalenessSeconds": 86400,
+    "ownershipTransferred": true
   },
   "explorer": "https://sepolia.etherscan.io",
   "verified": true
