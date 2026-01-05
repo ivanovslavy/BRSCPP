@@ -53,6 +53,8 @@ contract CryptoPaymentGateway is Ownable, ReentrancyGuard, Pausable {
     mapping(address => uint256) public whitelistDiscount;
     /// @notice Tokens that bypass quote system (1:1 USD pegged stablecoins)
     mapping(address => bool) public directPaymentTokens;
+    /// @notice Mapping of used order IDs (prevents double payment)
+    mapping(bytes32 => bool) public usedOrders;
 
 // ============ Structs ============
 
@@ -197,6 +199,7 @@ contract CryptoPaymentGateway is Ownable, ReentrancyGuard, Pausable {
     error BothOraclesFailed();
     error UnauthorizedQuoteUse();
     error PriceStale();
+    error OrderAlreadyPaid();
 
 // ============ Constructor ============
 
@@ -327,63 +330,70 @@ contract CryptoPaymentGateway is Ownable, ReentrancyGuard, Pausable {
 // ============ Payment Processing Functions ============
 
     /**
-     * @notice Process ETH payment using a locked quote
-     * @param quoteId Quote identifier from lockPriceQuote
-     * @param merchant Merchant receiving payment
-     * @param orderId Unique order identifier from merchant
-     * @return paymentId Unique payment identifier
-     * @dev Customer sends exact ETH amount specified in quote
-     * @dev Quote must be valid and not expired
-     */
-    function processETHPaymentWithQuote(
-        bytes32 quoteId,
-        address merchant,
-        string calldata orderId
+ * @notice Process ETH payment using a locked quote
+ * @param quoteId Quote identifier from lockPriceQuote
+ * @param merchant Merchant receiving payment
+ * @param orderId Unique order identifier from merchant
+ * @return paymentId Unique payment identifier
+ * @dev Customer sends exact ETH amount specified in quote
+ * @dev Quote must be valid and not expired
+ * @dev Each orderId can only be paid once
+ */
+  function processETHPaymentWithQuote(
+    bytes32 quoteId,
+    address merchant,
+    string calldata orderId
     ) external payable nonReentrant whenNotPaused returns (uint256 paymentId) {
-        PriceQuote storage quote = priceQuotes[quoteId];
+    PriceQuote storage quote = priceQuotes[quoteId];
+    
+    // ============ CHECKS ============
+    // Order validation - prevent double payment
+    bytes32 orderHash = keccak256(abi.encodePacked(orderId));
+    if (usedOrders[orderHash]) revert OrderAlreadyPaid();
+    
+    // Quote validation
+    if (quote.createdAtBlock == 0) revert QuoteNotFound();
+    if (quote.isUsed) revert QuoteAlreadyUsed();
+    if (block.number > quote.validUntilBlock) revert QuoteExpired();
+    if (quote.token != ETH_ADDRESS) revert InvalidQuote();
+    if (quote.creator != msg.sender) revert UnauthorizedQuoteUse();
+    if (merchant == address(0)) revert InvalidAddress();
+    
+    uint256 tokenAmount = quote.tokenAmount;
+    if (msg.value != tokenAmount) revert AmountMismatch();
+    
+    uint256 feeAmount = _calculateFee(tokenAmount, merchant);
+    uint256 merchantAmount = tokenAmount - feeAmount;
+    
+    // ============ EFFECTS (State Changes) - CEI Pattern ============
+    usedOrders[orderHash] = true;  // Mark order as paid
+    quote.isUsed = true;
+    paymentId = ++paymentCounter;
+    
+    // Emit event BEFORE external calls
+    emit PaymentProcessed(
+        paymentId,
+        quoteId,
+        merchant,
+        msg.sender,
+        ETH_ADDRESS,
+        tokenAmount,
+        merchantAmount,
+        feeAmount,
+        quote.usdAmount,
+        orderId,
+        block.number
+    );
 
-        // ============ CHECKS ============
-        if (quote.createdAtBlock == 0) revert QuoteNotFound();
-        if (quote.isUsed) revert QuoteAlreadyUsed();
-        if (block.number > quote.validUntilBlock) revert QuoteExpired();
-        if (quote.token != ETH_ADDRESS) revert InvalidQuote();
-        if (quote.creator != msg.sender) revert UnauthorizedQuoteUse();
-        if (merchant == address(0)) revert InvalidAddress();
-
-        uint256 tokenAmount = quote.tokenAmount;
-        if (msg.value != tokenAmount) revert AmountMismatch();
-        
-        uint256 feeAmount = _calculateFee(tokenAmount, merchant);
-        uint256 merchantAmount = tokenAmount - feeAmount;
-
-        // ============ EFFECTS (State Changes) - CEI Pattern ============
-        quote.isUsed = true;
-        paymentId = ++paymentCounter;
-        
-        // Emit event BEFORE external calls
-        emit PaymentProcessed(
-            paymentId,
-            quoteId,
-            merchant,
-            msg.sender,
-            ETH_ADDRESS,
-            tokenAmount,
-            merchantAmount,
-            feeAmount,
-            quote.usdAmount,
-            orderId,
-            block.number
-        );
-
-        // ============ INTERACTIONS (External Calls) ============
-        // Transfer ETH to merchant
-        _transferETH(merchant, merchantAmount);
-        // Transfer fee to collector
-        if (feeAmount > 0) {
-            _transferETH(feeCollector, feeAmount);
-        }
-        
-        return paymentId;
+    // ============ INTERACTIONS (External Calls) ============
+    // Transfer ETH to merchant
+    _transferETH(merchant, merchantAmount);
+    // Transfer fee to collector
+    if (feeAmount > 0) {
+        _transferETH(feeCollector, feeAmount);
+    }
+    
+    return paymentId;
     }
 
     /**
@@ -396,55 +406,58 @@ contract CryptoPaymentGateway is Ownable, ReentrancyGuard, Pausable {
      * @dev Transfers tokens from customer to merchant (minus fee)
      */
     function processTokenPaymentWithQuote(
-        bytes32 quoteId,
-        address merchant,
-        string calldata orderId
+    bytes32 quoteId,
+    address merchant,
+    string calldata orderId
     ) external nonReentrant whenNotPaused returns (uint256 paymentId) {
-        PriceQuote storage quote = priceQuotes[quoteId];
+    PriceQuote storage quote = priceQuotes[quoteId];
 
-        // ============ CHECKS ============
-        if (quote.createdAtBlock == 0) revert QuoteNotFound();
-        if (quote.isUsed) revert QuoteAlreadyUsed();
-        if (block.number > quote.validUntilBlock) revert QuoteExpired();
-        if (quote.token == ETH_ADDRESS) revert InvalidQuote();
-        if (quote.creator != msg.sender) revert UnauthorizedQuoteUse();
-        if (merchant == address(0)) revert InvalidAddress();
+    // ============ CHECKS ============
+    // Order validation - prevent double payment
+    bytes32 orderHash = keccak256(abi.encodePacked(orderId));
+    if (usedOrders[orderHash]) revert OrderAlreadyPaid();
+    
+    if (quote.createdAtBlock == 0) revert QuoteNotFound();
+    if (quote.isUsed) revert QuoteAlreadyUsed();
+    if (block.number > quote.validUntilBlock) revert QuoteExpired();
+    if (quote.token == ETH_ADDRESS) revert InvalidQuote();
+    if (quote.creator != msg.sender) revert UnauthorizedQuoteUse();
+    if (merchant == address(0)) revert InvalidAddress();
 
-        address token = quote.token;
-        uint256 tokenAmount = quote.tokenAmount;
-        IERC20 tokenContract = IERC20(token);
-        
-        uint256 feeAmount = _calculateFee(tokenAmount, merchant);
-        uint256 merchantAmount = tokenAmount - feeAmount;
+    address token = quote.token;
+    uint256 tokenAmount = quote.tokenAmount;
+    IERC20 tokenContract = IERC20(token);
+    
+    uint256 feeAmount = _calculateFee(tokenAmount, merchant);
+    uint256 merchantAmount = tokenAmount - feeAmount;
 
-        // ============ EFFECTS (State Changes) - CEI Pattern ============
-        quote.isUsed = true;
-        paymentId = ++paymentCounter;
+    // ============ EFFECTS (State Changes) - CEI Pattern ============
+    usedOrders[orderHash] = true;  // Mark order as paid
+    quote.isUsed = true;
+    paymentId = ++paymentCounter;
 
-        // Emit event BEFORE external calls
-        emit PaymentProcessed(
-            paymentId,
-            quoteId,
-            merchant,
-            msg.sender,
-            token,
-            tokenAmount,
-            merchantAmount,
-            feeAmount,
-            quote.usdAmount,
-            orderId,
-            block.number
-        );
+    // Emit event BEFORE external calls
+    emit PaymentProcessed(
+        paymentId,
+        quoteId,
+        merchant,
+        msg.sender,
+        token,
+        tokenAmount,
+        merchantAmount,
+        feeAmount,
+        quote.usdAmount,
+        orderId,
+        block.number
+    );
 
-        // ============ INTERACTIONS (External Calls) ============
-        // Transfer tokens from customer to merchant
-        tokenContract.safeTransferFrom(msg.sender, merchant, merchantAmount);
-        // Transfer fee to collector
-        if (feeAmount > 0) {
-            tokenContract.safeTransferFrom(msg.sender, feeCollector, feeAmount);
-        }
-        
-        return paymentId;
+    // ============ INTERACTIONS (External Calls) ============
+    tokenContract.safeTransferFrom(msg.sender, merchant, merchantAmount);
+    if (feeAmount > 0) {
+        tokenContract.safeTransferFrom(msg.sender, feeCollector, feeAmount);
+    }
+    
+    return paymentId;
     }
 
     /**
@@ -458,51 +471,53 @@ contract CryptoPaymentGateway is Ownable, ReentrancyGuard, Pausable {
      * @dev No price oracle needed, respects whitelist fee discounts
      */
     function processDirectPayment(
-        address token,
-        uint256 amount,
-        address merchant,
-        string calldata orderId
-    ) external nonReentrant whenNotPaused returns (uint256 paymentId) {
+    address token,
+    uint256 amount,
+    address merchant,
+    string calldata orderId
+) external nonReentrant whenNotPaused returns (uint256 paymentId) {
 
-        // ============ CHECKS ============
-        if (!directPaymentTokens[token]) revert TokenNotSupported();
-        if (amount == 0) revert InvalidAmount();
-        if (merchant == address(0)) revert InvalidAddress();
+    // ============ CHECKS ============
+    // Order validation - prevent double payment
+    bytes32 orderHash = keccak256(abi.encodePacked(orderId));
+    if (usedOrders[orderHash]) revert OrderAlreadyPaid();
+    
+    if (!directPaymentTokens[token]) revert TokenNotSupported();
+    if (amount == 0) revert InvalidAmount();
+    if (merchant == address(0)) revert InvalidAddress();
 
-        IERC20 tokenContract = IERC20(token);
-        // Check allowance
-        if (tokenContract.allowance(msg.sender, address(this)) < amount) {
-            revert InsufficientBalance();
-        }
-        
-        uint256 feeAmount = _calculateFee(amount, merchant);
-        uint256 merchantAmount = amount - feeAmount;
+    IERC20 tokenContract = IERC20(token);
+    if (tokenContract.allowance(msg.sender, address(this)) < amount) {
+        revert InsufficientBalance();
+    }
+    
+    uint256 feeAmount = _calculateFee(amount, merchant);
+    uint256 merchantAmount = amount - feeAmount;
 
-        // ============ EFFECTS (State Changes) - CEI Pattern ============
-        paymentId = ++paymentCounter;
+    // ============ EFFECTS (State Changes) - CEI Pattern ============
+    usedOrders[orderHash] = true;  // Mark order as paid
+    paymentId = ++paymentCounter;
 
-        // Emit event BEFORE external calls
-        emit DirectPaymentProcessed(
-            paymentId,
-            merchant,
-            msg.sender,
-            token,
-            amount,
-            merchantAmount,
-            feeAmount,
-            orderId,
-            block.number
-        );
+    // Emit event BEFORE external calls
+    emit DirectPaymentProcessed(
+        paymentId,
+        merchant,
+        msg.sender,
+        token,
+        amount,
+        merchantAmount,
+        feeAmount,
+        orderId,
+        block.number
+    );
 
-        // ============ INTERACTIONS (External Calls) ============
-        // Transfer from customer to merchant
-        tokenContract.safeTransferFrom(msg.sender, merchant, merchantAmount);
-        // Transfer fee to collector
-        if (feeAmount > 0) {
-            tokenContract.safeTransferFrom(msg.sender, feeCollector, feeAmount);
-        }
-        
-        return paymentId;
+    // ============ INTERACTIONS (External Calls) ============
+    tokenContract.safeTransferFrom(msg.sender, merchant, merchantAmount);
+    if (feeAmount > 0) {
+        tokenContract.safeTransferFrom(msg.sender, feeCollector, feeAmount);
+    }
+    
+    return paymentId;
     }
 
 // ============ Internal Helper Functions ============
@@ -1046,6 +1061,18 @@ contract CryptoPaymentGateway is Ownable, ReentrancyGuard, Pausable {
             emit EmergencyWithdraw(token, amount, to);
             tokenContract.safeTransfer(to, amount); 
         }
+    }
+
+// ============ View Functions ============
+
+    /**
+     * @notice Check if an order has already been paid
+     * @param orderId Order identifier to check
+     * @return True if order has been paid
+     */
+    function isOrderPaid(string calldata orderId) external view returns (bool) {
+        bytes32 orderHash = keccak256(abi.encodePacked(orderId));
+        return usedOrders[orderHash];
     }
 
 // ============ Receive Function ============
