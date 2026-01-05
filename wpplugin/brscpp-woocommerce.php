@@ -247,7 +247,7 @@ function brscpp_handle_webhook(WP_REST_Request $request) {
             brscpp_log('❌ Invalid signature!');
             return new WP_REST_Response(['error' => 'Invalid signature'], 401);
         }
-        brscpp_log('✅ Signature verified');
+        brscpp_log('Signature verified');
     }
     
     // Handle event
@@ -272,7 +272,7 @@ function brscpp_handle_payment_completed($payload) {
     
     // Extract WooCommerce order ID: "WC-12345-abc123" -> 12345
     if (!preg_match('/^WC-(\d+)-/', $order_id_full, $matches)) {
-        brscpp_log('❌ Invalid order ID format: ' . $order_id_full);
+        brscpp_log('Invalid order ID format: ' . $order_id_full);
         return new WP_REST_Response(['error' => 'Invalid order ID format'], 400);
     }
     
@@ -280,7 +280,7 @@ function brscpp_handle_payment_completed($payload) {
     $order = wc_get_order($wc_order_id);
     
     if (!$order) {
-        brscpp_log('❌ Order not found: ' . $wc_order_id);
+        brscpp_log('Order not found: ' . $wc_order_id);
         return new WP_REST_Response(['error' => 'Order not found'], 404);
     }
     
@@ -293,7 +293,7 @@ function brscpp_handle_payment_completed($payload) {
     // Verify stored BRSCPP order ID matches
     $stored_brscpp_id = $order->get_meta('_brscpp_order_id');
     if ($stored_brscpp_id && $stored_brscpp_id !== $order_id_full) {
-        brscpp_log('❌ Order ID mismatch! Stored: ' . $stored_brscpp_id . ', Received: ' . $order_id_full);
+        brscpp_log('Order ID mismatch! Stored: ' . $stored_brscpp_id . ', Received: ' . $order_id_full);
         return new WP_REST_Response(['error' => 'Order ID mismatch'], 400);
     }
     
@@ -323,7 +323,7 @@ function brscpp_handle_payment_completed($payload) {
     
     // Add order note
     $order->add_order_note(sprintf(
-        '✅ Crypto payment confirmed!
+        'Crypto payment confirmed!
 Network: %s
 Token: %s
 Amount: %s %s
@@ -351,7 +351,7 @@ Mode: %s',
     $order->update_meta_data('_brscpp_block_number', $block_number);
     $order->save();
     
-    brscpp_log('✅ Order ' . $wc_order_id . ' marked as paid. TX: ' . $tx_hash);
+    brscpp_log('Order ' . $wc_order_id . ' marked as paid. TX: ' . $tx_hash);
     
     return new WP_REST_Response([
         'status' => 'success',
@@ -456,7 +456,7 @@ add_action('woocommerce_admin_order_data_after_billing_address', function($order
     $explorer_url = ($explorers[$network] ?? '') . $tx_hash;
     
     echo '<div class="brscpp-payment-info" style="margin-top:20px;padding:15px;background:#f8f9fa;border-left:4px solid #28a745;">';
-    echo '<h3 style="margin:0 0 10px;">💰 Crypto Payment Details</h3>';
+    echo '<h3 style="margin:0 0 10px;">Crypto Payment Details</h3>';
     echo '<p><strong>Network:</strong> ' . esc_html($network) . '</p>';
     echo '<p><strong>Token:</strong> ' . esc_html($token) . '</p>';
     echo '<p><strong>Amount:</strong> ' . esc_html($amount) . ' ' . esc_html($token) . '</p>';
